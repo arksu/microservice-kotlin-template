@@ -1,4 +1,4 @@
-package com
+package com.company
 
 import io.ktor.client.request.*
 import io.ktor.http.*

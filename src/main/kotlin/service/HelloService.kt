@@ -1,9 +1,9 @@
-package com.service
+package com.company.service
 
-import com.config.Database
+import com.company.config.Database
 import com.company.jooq.tables.references.USERS
-import com.config.toFlux
-import com.config.toMono
+import com.company.config.toFlux
+import com.company.config.toMono
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitSingle
 import org.jooq.impl.DSL

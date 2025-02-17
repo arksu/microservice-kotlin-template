@@ -1,4 +1,4 @@
-package com.config
+package com.company.config
 
 import io.ktor.server.application.*
 import io.r2dbc.pool.ConnectionPool

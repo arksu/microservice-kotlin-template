@@ -1,12 +1,13 @@
-package com
+package com.company
 
-import com.config.configureKoin
-import com.config.configureRouting
-import com.config.configureSerialization
+import com.company.config.configureKoin
+import com.company.config.configureRouting
+import com.company.config.configureSerialization
 import io.ktor.server.application.*
+import io.ktor.server.netty.*
 
 fun main(args: Array<String>) {
-    io.ktor.server.netty.EngineMain.main(args)
+    EngineMain.main(args)
 }
 
 fun Application.module() {

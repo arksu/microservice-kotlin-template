@@ -1,6 +1,6 @@
-package com.config
+package com.company.config
 
-import com.service.HelloService
+import com.company.service.HelloService
 import io.ktor.server.application.*
 import org.koin.core.module.dsl.createdAtStart
 import org.koin.core.module.dsl.singleOf

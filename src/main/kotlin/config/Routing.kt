@@ -1,6 +1,6 @@
-package com.config
+package com.company.config
 
-import com.service.HelloService
+import com.company.service.HelloService
 import io.ktor.server.application.*
 import io.ktor.server.plugins.requestvalidation.*
 import io.ktor.server.response.*

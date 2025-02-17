@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.flyway)
 }
 
-group = "com"
+group = "com.company"
 version = "0.0.1"
 
 application {
@@ -47,7 +47,7 @@ dependencies {
     implementation(libs.logback.classic)
     implementation(libs.koin.ktor)
     implementation(libs.koin.logger.slf4j)
-//    implementation(libs.ktor.server.kafka)
+    implementation(libs.ktor.server.kafka)
 
     implementation(libs.kotlinx.coroutines.reactor)
 

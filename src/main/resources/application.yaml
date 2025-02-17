@@ -1,0 +1,16 @@
+ktor:
+  application:
+    modules:
+      - com.ApplicationKt.module
+  deployment:
+    port: 7056
+
+db:
+  url: "jdbc:mariadb://localhost:3409/project_name"
+  user: project_name
+  password: project_name
+
+jwt:
+  domain: "https://jwt-provider-domain/"
+  audience: "jwt-audience"
+  realm: "ktor sample app"

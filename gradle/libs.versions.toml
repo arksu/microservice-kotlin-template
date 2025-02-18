@@ -37,6 +37,7 @@ r2dbc-mysql = { module = "io.asyncer:r2dbc-mysql", version.ref = "r2dbc-mysql-ve
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-version" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor-version" }
 jooq = { id = "nu.studer.jooq", version.ref = "jooq-plugin-version" }
 flyway = { id = "org.flywaydb.flyway", version.ref = "flyway-version" }

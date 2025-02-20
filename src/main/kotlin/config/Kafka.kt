@@ -4,25 +4,8 @@ import io.ktor.server.application.*
 import io.ktor.server.config.*
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerConfig
+import org.koin.core.module.Module
 import java.util.*
-
-data class ProducerConfigProps(
-    val keySerializer: String,
-    val valueSerializer: String,
-    val topic: String
-)
-
-data class ConsumerConfigProps(
-    val keyDeserializer: String,
-    val valueDeserializer: String,
-    val autoOffsetReset: String,
-    val topic: String
-)
-
-data class KafkaGlobalConfig(
-    val bootstrapServers: List<String>,
-    val groupId: String
-)
 
 fun ApplicationConfig.getKafkaGlobalConfig(): ApplicationConfig {
     return this.config("kafka")
@@ -48,7 +31,7 @@ fun ApplicationConfig.getKafkaConsumerConfigs(): Map<String, ApplicationConfig> 
     return consumersMap
 }
 
-fun Application.configureKafka() {
+fun Application.configureKafkaModule(): Module {
     val kafkaGlobalConfig = environment.config.getKafkaGlobalConfig()
     val producerConfigs = environment.config.getKafkaProducerConfigs()
     val consumerConfigs = environment.config.getKafkaConsumerConfigs()
@@ -58,9 +41,18 @@ fun Application.configureKafka() {
             put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaGlobalConfig.property("bootstrapServers").getList())
             put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, conf.property("keySerializer").getString())
             put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, conf.property("valueSerializer").getString())
+            conf.propertyOrNull("acks")?.let {
+                put(ProducerConfig.ACKS_CONFIG, it.getString())
+            }
         }
-        KafkaProducer<String, String>(props)
+        KafkaProducer(props)
     }
 
-    println(consumerConfigs)
+    println(producers)
+
+
+    val module = org.koin.dsl.module {
+        single { producers }
+    }
+    return module
 }

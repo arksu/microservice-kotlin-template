@@ -1,6 +1,7 @@
 package com.company.config
 
 import com.company.service.HelloService
+import com.company.service.SerializationService
 import io.ktor.server.application.*
 import org.koin.core.module.dsl.createdAtStart
 import org.koin.core.module.dsl.singleOf
@@ -13,9 +14,10 @@ fun Application.configureKoin() {
             singleOf(::Database) {
                 createdAtStart()
             }
+            singleOf(::SerializationService)
             singleOf(::HelloService)
         }
-        modules(module)
+        modules(module, configureKafkaModule())
     }
 
 }

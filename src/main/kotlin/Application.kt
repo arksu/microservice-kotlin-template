@@ -1,6 +1,5 @@
 package com.company
 
-import com.company.config.configureKafka
 import com.company.config.configureKoin
 import com.company.config.configureRouting
 import com.company.config.configureSerialization
@@ -13,7 +12,6 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
     configureSerialization()
-    configureKafka()
     configureKoin()
 //    configureMonitoring()
 //    configureSecurity()

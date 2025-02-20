@@ -25,6 +25,7 @@ fun Application.configureRouting() {
 
         get("/kafka") {
             service.produceKafkaMessage()
+            call.respond("ok")
         }
     }
 

@@ -51,6 +51,8 @@ dependencies {
     implementation(libs.kafka.clients)
 
     implementation(libs.kotlinx.coroutines.reactor)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.jdk8)
 
     implementation(libs.r2dbc.pool)
     implementation(libs.r2dbc.mysql)

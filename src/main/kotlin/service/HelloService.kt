@@ -4,20 +4,27 @@ import com.company.config.Database
 import com.company.config.toFlux
 import com.company.config.toMono
 import com.company.jooq.tables.references.USERS
+import com.company.util.asyncSend
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitSingle
+import org.apache.kafka.clients.producer.KafkaProducer
+import org.apache.kafka.clients.producer.ProducerRecord
 import org.jooq.impl.DSL
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-class HelloService : KoinComponent {
-    private val database: Database by inject()
+class HelloService(
+    private val database: Database,
+    private val serializationService: SerializationService,
+    producers: Map<String, KafkaProducer<String, String>>
+) : KoinComponent {
 
     val map = ConcurrentHashMap<String, String>()
 
-    suspend fun hello(): List<DTO> {
+    private val prod = producers["prod1"] ?: throw RuntimeException("no required producer")
+
+    suspend fun hello(): List<UserDTO> {
         val charset = ('a'..'z').toList()
         val name = (1..128)
             .map { charset.random() }
@@ -45,16 +52,18 @@ class HelloService : KoinComponent {
                 .awaitSingle()
         }
         return list.map {
-            DTO(it.id!!, it.name)
+            UserDTO(it.id!!, it.name)
         }
     }
 
     suspend fun produceKafkaMessage() {
-        val dto = KafkaDTO(UUID.randomUUID(), "fdsfds")
-        // todo
+        val dto = KafkaDTO(UUID.randomUUID(), "some data")
+
+        val rec = ProducerRecord("topic1", dto.id.toString(), serializationService.writeValueAsString(dto))
+        prod.asyncSend(rec)
     }
 
-    data class DTO(
+    data class UserDTO(
         val id: Long,
         val name: String,
     )

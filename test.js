@@ -16,10 +16,10 @@ export let options = {
 export default function () {
   const BASE_URL = 'http://localhost:7056'
 
-  http.get(`${BASE_URL}`)
-  sleep(0.05)
+  // http.get(`${BASE_URL}`)
+  // sleep(0.05)
 
-  http.get(`${BASE_URL}/json`)
+  http.get(`${BASE_URL}/kafka`)
   sleep(0.05)
 
 }

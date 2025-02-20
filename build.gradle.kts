@@ -48,7 +48,7 @@ dependencies {
     implementation(libs.logback.classic)
     implementation(libs.koin.ktor)
     implementation(libs.koin.logger.slf4j)
-    implementation(libs.ktor.server.kafka)
+    implementation(libs.kafka.clients)
 
     implementation(libs.kotlinx.coroutines.reactor)
 

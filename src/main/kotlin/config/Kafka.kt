@@ -1,59 +1,66 @@
 package com.company.config
 
-import com.company.service.HelloService
-import io.github.flaxoos.ktor.server.plugins.kafka.*
-import io.ktor.client.*
 import io.ktor.server.application.*
+import io.ktor.server.config.*
+import org.apache.kafka.clients.producer.KafkaProducer
+import org.apache.kafka.clients.producer.ProducerConfig
+import java.util.*
 
+data class ProducerConfigProps(
+    val keySerializer: String,
+    val valueSerializer: String,
+    val topic: String
+)
+
+data class ConsumerConfigProps(
+    val keyDeserializer: String,
+    val valueDeserializer: String,
+    val autoOffsetReset: String,
+    val topic: String
+)
+
+data class KafkaGlobalConfig(
+    val bootstrapServers: List<String>,
+    val groupId: String
+)
+
+fun ApplicationConfig.getKafkaGlobalConfig(): ApplicationConfig {
+    return this.config("kafka")
+}
+
+fun ApplicationConfig.getKafkaProducerConfigs(): Map<String, ApplicationConfig> {
+    val producersConfig = this.config("kafka.producers")
+    val producersMap = mutableMapOf<String, ApplicationConfig>()
+    for (name in producersConfig.toMap().keys) {
+        val conf = producersConfig.config(name)
+        producersMap[name] = conf
+    }
+    return producersMap
+}
+
+fun ApplicationConfig.getKafkaConsumerConfigs(): Map<String, ApplicationConfig> {
+    val consumersConfig = this.config("kafka.consumers")
+    val consumersMap = mutableMapOf<String, ApplicationConfig>()
+    for (name in consumersConfig.toMap().keys) {
+        val conf = consumersConfig.config(name)
+        consumersMap[name] = conf
+    }
+    return consumersMap
+}
 
 fun Application.configureKafka() {
-    install(Kafka) {
-        schemaRegistryUrl = "localhost:9092"
-        val myTopic = TopicName.named("my-topic")
-        val myTopic2 = TopicName.named("my-topic2")
-//        topic(myTopic) {
-//            partitions = 1
-//            replicas = 1
-//            configs {
-//                messageTimestampType = MessageTimestampType.CreateTime
-//            }
-//        }
-//        topic(myTopic2) {
-//            partitions = 1
-//            replicas = 1
-//            configs {
-//                messageTimestampType = MessageTimestampType.CreateTime
-//            }
-//        }
-        common { // <-- Define common properties
-            bootstrapServers = listOf("localhost:9092")
-            retries = 1
-            clientId = "my-client-id"
-        }
-        admin { } // <-- Creates an admin client
-        producer { // <-- Creates a producer
-            clientId = "my-client-id"
-        }
-        consumer { // <-- Creates a consumer
-            groupId = "my-group-id"
-            clientId = "my-client-id-override" //<-- Override common properties
-        }
-        consumerConfig {
-            consumerRecordHandler(myTopic) { record ->
-                // Do something with record
-                println(record)
-            }
-            consumerRecordHandler(myTopic2) { record ->
-                // Do something with record
-                println(record)
-            }
-        }
-        registerSchemas {
-            using { // <-- optionally provide a client, by default CIO is used
-                HttpClient()
-            }
+    val kafkaGlobalConfig = environment.config.getKafkaGlobalConfig()
+    val producerConfigs = environment.config.getKafkaProducerConfigs()
+    val consumerConfigs = environment.config.getKafkaConsumerConfigs()
 
-            HelloService.KafkaDTO::class at myTopic // <-- Will register schema upon startup
+    val producers: Map<String, KafkaProducer<String, String>> = producerConfigs.mapValues { (_, conf) ->
+        val props = Properties().apply {
+            put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaGlobalConfig.property("bootstrapServers").getList())
+            put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, conf.property("keySerializer").getString())
+            put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, conf.property("valueSerializer").getString())
         }
+        KafkaProducer<String, String>(props)
     }
+
+    println(consumerConfigs)
 }

@@ -19,8 +19,8 @@ export default function () {
   http.get(`${BASE_URL}`)
   sleep(0.05)
 
-  http.get(`${BASE_URL}/kafka`)
-  sleep(0.05)
+  // http.get(`${BASE_URL}/kafka`)
+  // sleep(0.05)
 
 }
 

@@ -8,7 +8,6 @@ import com.company.util.asyncSend
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitSingle
 import org.apache.kafka.clients.producer.KafkaProducer
-import org.apache.kafka.clients.producer.ProducerRecord
 import org.jooq.impl.DSL
 import org.koin.core.component.KoinComponent
 import java.util.*
@@ -22,7 +21,7 @@ class HelloService(
 
     val map = ConcurrentHashMap<String, String>()
 
-    private val prod = producers["prod1"] ?: throw RuntimeException("no required producer")
+    private val producer = producers["prod1"] ?: throw RuntimeException("no required producer")
 
     suspend fun hello(): List<UserDTO> {
         val charset = ('a'..'z').toList()
@@ -59,8 +58,7 @@ class HelloService(
     suspend fun produceKafkaMessage() {
         val dto = KafkaDTO(UUID.randomUUID(), "some data")
 
-        val rec = ProducerRecord("topic1", dto.id.toString(), serializationService.writeValueAsString(dto))
-        prod.asyncSend(rec)
+        producer.asyncSend("topic1", dto.id.toString(), serializationService.writeValueAsString(dto))
     }
 
     data class UserDTO(

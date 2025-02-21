@@ -68,7 +68,7 @@ fun Application.configureKafkaModule(): Module {
                 while (isActive) {
                     val records = consumer.poll(Duration.ofMillis(100))
                     for (record in records) {
-                        println("Consumed message: key=${record.key()}, value=${record.value()}, offset=${record.offset()}")
+//                        println("Consumed message: key=${record.key()}, value=${record.value()}, offset=${record.offset()}")
                         // TODO Add any processing logic here.
                     }
                 }

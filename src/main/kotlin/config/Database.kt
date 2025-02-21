@@ -22,7 +22,8 @@ class Database(
     environment: ApplicationEnvironment
 ) : KoinComponent {
 
-    val dialect = SQLDialect.MARIADB
+//    val dialect = SQLDialect.MARIADB
+    val dialect = SQLDialect.POSTGRES
 
     val url = environment.config.propertyOrNull("db.url")?.getString() ?: throw RuntimeException("db.url is not set")
     val user = environment.config.propertyOrNull("db.user")?.getString() ?: throw RuntimeException("db.user is not set")
@@ -32,7 +33,8 @@ class Database(
         val r2dbcUrl = url.replace("jdbc", "r2dbc")
         val options = ConnectionFactoryOptions.parse(r2dbcUrl).mutate()
             .option(DRIVER, "pool")
-            .option(PROTOCOL, "mysql")
+//            .option(PROTOCOL, "mysql")
+            .option(PROTOCOL, "postgresql")
             .option(USER, user)
             .option(PASSWORD, password)
             .option(CONNECT_TIMEOUT, Duration.ofSeconds(3))

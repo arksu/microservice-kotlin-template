@@ -13,28 +13,20 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 
 class HelloService(
     private val database: Database,
 ) : KoinComponent {
 
-    private val map = ConcurrentHashMap<String, String>()
-
     private val producer: KafkaProducer<Any, String> by inject(qualifier = named("stringProducer"))
     private val producer2: KafkaProducer<Any, String> by inject(qualifier = named("intProducer"))
 
+    private val charset = ('a'..'z').toList()
+
     suspend fun hello(): List<UserDTO> {
-        val charset = ('a'..'z').toList()
         val name = (1..128)
             .map { charset.random() }
             .joinToString("")
-
-        if (map.containsKey(name)) {
-            println("collision")
-            return listOf()
-        }
-        map.put(name, "1")
 
         val list = database.transactionalJooq { context ->
 

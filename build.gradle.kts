@@ -55,11 +55,15 @@ dependencies {
     implementation(libs.kotlinx.coroutines.jdk8)
 
     implementation(libs.r2dbc.pool)
-    implementation(libs.r2dbc.mysql)
+//    implementation(libs.r2dbc.mysql)
+    implementation(libs.r2dbc.postgresql)
     implementation(libs.flyway.core)
-    runtimeOnly(libs.flyway.mysql)
-    runtimeOnly(libs.mariadb.java.client)
-    jooqGenerator(libs.mariadb.java.client)
+//    runtimeOnly(libs.flyway.mysql)
+//    runtimeOnly(libs.mariadb.java.client)
+    runtimeOnly(libs.flyway.postgres)
+    runtimeOnly(libs.postgres)
+//    jooqGenerator(libs.mariadb.java.client)
+    jooqGenerator(libs.postgres)
 
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
@@ -67,13 +71,16 @@ dependencies {
 
 buildscript {
     dependencies {
-        classpath(libs.flyway.mysql)
-        classpath(libs.mariadb.java.client)
+//        classpath(libs.flyway.mysql)
+//        classpath(libs.mariadb.java.client)
+        classpath(libs.flyway.postgres)
+        classpath(libs.postgres)
     }
 }
 
 flyway {
-    url = "jdbc:mariadb://localhost:3409/project_name"
+//    url = "jdbc:mariadb://localhost:3409/project_name"
+    url = "jdbc:postgresql://localhost:5332/project_name"
     user = "project_name"
     password = "project_name"
     schemas = arrayOf("project_name")
@@ -90,15 +97,18 @@ jooq {
             jooqConfiguration.apply {
                 logging = org.jooq.meta.jaxb.Logging.WARN
                 jdbc.apply {
-                    driver = "org.mariadb.jdbc.Driver"
-                    url = "jdbc:mariadb://localhost:3409/project_name"
+//                    driver = "org.mariadb.jdbc.Driver"
+                    driver = "org.postgresql.Driver"
+//                    url = "jdbc:mariadb://localhost:3409/project_name"
+                    url = "jdbc:postgresql://localhost:5332/project_name"
                     user = "project_name"
                     password = "project_name"
                 }
                 generator.apply {
                     name = "org.jooq.codegen.KotlinGenerator"
                     database.apply {
-                        name = "org.jooq.meta.mariadb.MariaDBDatabase"
+//                        name = "org.jooq.meta.mariadb.MariaDBDatabase"
+                        name = "org.jooq.meta.postgres.PostgresDatabase"
                         inputSchema = "project_name"
                         excludes = "flyway_schema_history"
                     }

@@ -20,16 +20,17 @@ kafka:
   groupId: "group1"
   consumers:
     cons1:
+      topic: "topic1"
       keyDeserializer: "org.apache.kafka.common.serialization.StringDeserializer"
       valueDeserializer: "org.apache.kafka.common.serialization.StringDeserializer"
       autoOffsetReset: "earliest"
-      topic: "topic1"
   producers:
     prod1:
+      topic: "topic1"
       keySerializer: "org.apache.kafka.common.serialization.StringSerializer"
       valueSerializer: "org.apache.kafka.common.serialization.StringSerializer"
-      topic: "topic1"
+      acks: all
     prod2:
+      topic: "topic1"
       keySerializer: "org.apache.kafka.common.serialization.StringSerializer"
       valueSerializer: "org.apache.kafka.common.serialization.StringSerializer"
-      topic: "topic1"

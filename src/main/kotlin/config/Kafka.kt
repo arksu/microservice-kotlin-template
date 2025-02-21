@@ -2,10 +2,18 @@ package com.company.config
 
 import io.ktor.server.application.*
 import io.ktor.server.config.*
+import kotlinx.coroutines.*
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerConfig
+import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.clients.producer.RecordMetadata
 import org.koin.core.module.Module
+import java.time.Duration
 import java.util.*
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 fun ApplicationConfig.getKafkaGlobalConfig(): ApplicationConfig {
     return this.config("kafka")
@@ -36,23 +44,73 @@ fun Application.configureKafkaModule(): Module {
     val producerConfigs = environment.config.getKafkaProducerConfigs()
     val consumerConfigs = environment.config.getKafkaConsumerConfigs()
 
-    val producers: Map<String, KafkaProducer<String, String>> = producerConfigs.mapValues { (_, conf) ->
+    val jobsMap = HashMap<String, Job>()
+    consumerConfigs.forEach { (name, config) ->
+        val consumerProps = Properties().apply {
+            put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaGlobalConfig.property("bootstrapServers").getList())
+            put(ConsumerConfig.GROUP_ID_CONFIG, kafkaGlobalConfig.property("groupId").getString())
+            put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, config.property("keyDeserializer").getString())
+            put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, config.property("valueDeserializer").getString())
+
+            config.propertyOrNull("autoOffsetReset")?.let {
+                put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, it.getString())
+            }
+        }
+        val consumer = KafkaConsumer<String, String>(consumerProps)
+        consumer.subscribe(listOf(config.property("topic").getString()))
+
+        val job = launch(Dispatchers.IO) {
+            try {
+                while (isActive) {
+                    val records = consumer.poll(Duration.ofMillis(100))
+                    for (record in records) {
+                        println("Consumed message: key=${record.key()}, value=${record.value()}, offset=${record.offset()}")
+                        // TODO Add any processing logic here.
+                    }
+                }
+            } finally {
+                consumer.close()
+            }
+        }
+        jobsMap[name] = job
+    }
+
+    // TODO
+
+    val producers: Map<String, KafkaProducer<String, String>> = producerConfigs.mapValues { (_, config) ->
         val props = Properties().apply {
             put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaGlobalConfig.property("bootstrapServers").getList())
-            put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, conf.property("keySerializer").getString())
-            put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, conf.property("valueSerializer").getString())
-            conf.propertyOrNull("acks")?.let {
+            put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, config.property("keySerializer").getString())
+            put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, config.property("valueSerializer").getString())
+            config.propertyOrNull("acks")?.let {
                 put(ProducerConfig.ACKS_CONFIG, it.getString())
             }
         }
         KafkaProducer(props)
     }
 
-    println(producers)
-
-
     val module = org.koin.dsl.module {
+        // todo single by names
         single { producers }
     }
     return module
+}
+
+suspend fun KafkaProducer<String, String>.asyncSend(topic: String, key: String, message: String): RecordMetadata {
+    val record = ProducerRecord(topic, key, message)
+    return asyncSend(record)
+}
+
+suspend fun <K, V> KafkaProducer<K, V>.asyncSend(record: ProducerRecord<K, V>): RecordMetadata {
+    return withContext(Dispatchers.IO) {
+        suspendCancellableCoroutine { cont ->
+            this@asyncSend.send(record) { metadata, exception ->
+                if (exception == null) {
+                    cont.resume(metadata) // Successfully sent
+                } else {
+                    cont.resumeWithException(exception) // Handle error
+                }
+            }
+        }
+    }
 }

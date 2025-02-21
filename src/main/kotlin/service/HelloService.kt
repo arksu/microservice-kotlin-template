@@ -1,10 +1,10 @@
 package com.company.service
 
 import com.company.config.Database
+import com.company.config.asyncSend
 import com.company.config.toFlux
 import com.company.config.toMono
 import com.company.jooq.tables.references.USERS
-import com.company.util.asyncSend
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitSingle
 import org.apache.kafka.clients.producer.KafkaProducer

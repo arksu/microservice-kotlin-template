@@ -30,7 +30,7 @@ kafka:
       keySerializer: "org.apache.kafka.common.serialization.StringSerializer"
       valueSerializer: "org.apache.kafka.common.serialization.StringSerializer"
       acks: all
-    prod2:
+    intProducer:
       topic: "topic1"
-      keySerializer: "org.apache.kafka.common.serialization.StringSerializer"
+      keySerializer: "org.apache.kafka.common.serialization.IntegerSerializer"
       valueSerializer: "org.apache.kafka.common.serialization.StringSerializer"

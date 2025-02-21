@@ -17,12 +17,12 @@ import java.util.concurrent.ConcurrentHashMap
 
 class HelloService(
     private val database: Database,
-    private val serializationService: SerializationService,
 ) : KoinComponent {
 
-    val map = ConcurrentHashMap<String, String>()
+    private val map = ConcurrentHashMap<String, String>()
 
-    private val producer: KafkaProducer<String, String> by inject(qualifier = named("stringProducer"))
+    private val producer: KafkaProducer<Any, String> by inject(qualifier = named("stringProducer"))
+    private val producer2: KafkaProducer<Any, String> by inject(qualifier = named("intProducer"))
 
     suspend fun hello(): List<UserDTO> {
         val charset = ('a'..'z').toList()
@@ -60,6 +60,7 @@ class HelloService(
         val dto = KafkaDTO(UUID.randomUUID(), "some data")
 
         producer.asyncSend("topic1", dto.id, dto)
+        producer2.asyncSend("topic2", 12, dto)
     }
 
     data class UserDTO(

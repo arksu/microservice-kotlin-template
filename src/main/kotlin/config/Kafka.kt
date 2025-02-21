@@ -81,7 +81,7 @@ fun Application.configureKafkaModule(): Module {
         jobsMap[name] = job
     }
 
-    val producers: Map<String, KafkaProducer<String, String>> = producerConfigs.mapValues { (_, config) ->
+    val producers: Map<String, KafkaProducer<Any, String>> = producerConfigs.mapValues { (_, config) ->
         val props = Properties().apply {
             put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaGlobalConfig.property("bootstrapServers").getList())
             put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, config.property("keySerializer").getString())
@@ -93,7 +93,7 @@ fun Application.configureKafkaModule(): Module {
         KafkaProducer(props)
     }
 
-    // close all consumers on application shutdown
+    // close all consumers and producers on application shutdown
     monitor.subscribe(ApplicationStopping) {
         consumersMap.entries.forEach { (name, consumer) ->
             consumer.wakeup()
@@ -114,13 +114,13 @@ fun Application.configureKafkaModule(): Module {
     return module
 }
 
-suspend fun KafkaProducer<String, String>.asyncSend(topic: String, key: UUID, message: Any): RecordMetadata {
-    val record = ProducerRecord(topic, key.toString(), gson.toJson(message))
+suspend fun KafkaProducer<Any, String>.asyncSend(topic: String, key: UUID, message: Any): RecordMetadata {
+    val record: ProducerRecord<Any, String> = ProducerRecord(topic, key.toString(), gson.toJson(message))
     return asyncSend(record)
 }
 
-suspend fun KafkaProducer<String, String>.asyncSend(topic: String, key: String, message: Any): RecordMetadata {
-    val record = ProducerRecord(topic, key, gson.toJson(message))
+suspend fun KafkaProducer<Any, String>.asyncSend(topic: String, key: Any, message: Any): RecordMetadata {
+    val record: ProducerRecord<Any, String> = ProducerRecord(topic, key, gson.toJson(message))
     return asyncSend(record)
 }
 

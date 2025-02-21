@@ -1,5 +1,6 @@
 package com.company.config
 
+import com.company.service.gson
 import io.ktor.server.application.*
 import io.ktor.server.config.*
 import kotlinx.coroutines.*
@@ -9,7 +10,9 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.clients.producer.RecordMetadata
+import org.apache.kafka.common.errors.WakeupException
 import org.koin.core.module.Module
+import org.koin.core.qualifier.named
 import java.time.Duration
 import java.util.*
 import kotlin.coroutines.resume
@@ -45,6 +48,7 @@ fun Application.configureKafkaModule(): Module {
     val consumerConfigs = environment.config.getKafkaConsumerConfigs()
 
     val jobsMap = HashMap<String, Job>()
+    val consumersMap = HashMap<String, KafkaConsumer<String, String>>()
     consumerConfigs.forEach { (name, config) ->
         val consumerProps = Properties().apply {
             put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaGlobalConfig.property("bootstrapServers").getList())
@@ -68,14 +72,14 @@ fun Application.configureKafkaModule(): Module {
                         // TODO Add any processing logic here.
                     }
                 }
+            } catch (_: WakeupException) {
             } finally {
                 consumer.close()
             }
         }
+        consumersMap[name] = consumer
         jobsMap[name] = job
     }
-
-    // TODO
 
     val producers: Map<String, KafkaProducer<String, String>> = producerConfigs.mapValues { (_, config) ->
         val props = Properties().apply {
@@ -89,15 +93,34 @@ fun Application.configureKafkaModule(): Module {
         KafkaProducer(props)
     }
 
+    // close all consumers on application shutdown
+    monitor.subscribe(ApplicationStopping) {
+        consumersMap.entries.forEach { (name, consumer) ->
+            consumer.wakeup()
+            runBlocking {
+                jobsMap[name]?.cancelAndJoin()
+            }
+        }
+        producers.values.forEach { producer ->
+            producer.close()
+        }
+    }
+
     val module = org.koin.dsl.module {
-        // todo single by names
-        single { producers }
+        producers.entries.forEach { (k, p) ->
+            single(qualifier = named(k)) { p }
+        }
     }
     return module
 }
 
-suspend fun KafkaProducer<String, String>.asyncSend(topic: String, key: String, message: String): RecordMetadata {
-    val record = ProducerRecord(topic, key, message)
+suspend fun KafkaProducer<String, String>.asyncSend(topic: String, key: UUID, message: Any): RecordMetadata {
+    val record = ProducerRecord(topic, key.toString(), gson.toJson(message))
+    return asyncSend(record)
+}
+
+suspend fun KafkaProducer<String, String>.asyncSend(topic: String, key: String, message: Any): RecordMetadata {
+    val record = ProducerRecord(topic, key, gson.toJson(message))
     return asyncSend(record)
 }
 

@@ -10,18 +10,19 @@ import kotlinx.coroutines.reactive.awaitSingle
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.jooq.impl.DSL
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 class HelloService(
     private val database: Database,
     private val serializationService: SerializationService,
-    producers: Map<String, KafkaProducer<String, String>>
 ) : KoinComponent {
 
     val map = ConcurrentHashMap<String, String>()
 
-    private val producer = producers["prod1"] ?: throw RuntimeException("no required producer")
+    private val producer: KafkaProducer<String, String> by inject(qualifier = named("stringProducer"))
 
     suspend fun hello(): List<UserDTO> {
         val charset = ('a'..'z').toList()
@@ -58,7 +59,7 @@ class HelloService(
     suspend fun produceKafkaMessage() {
         val dto = KafkaDTO(UUID.randomUUID(), "some data")
 
-        producer.asyncSend("topic1", dto.id.toString(), serializationService.writeValueAsString(dto))
+        producer.asyncSend("topic1", dto.id, dto)
     }
 
     data class UserDTO(

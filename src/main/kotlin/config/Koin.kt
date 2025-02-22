@@ -19,7 +19,7 @@ fun Application.configureKoin() {
         }
         modules(
             module,
-//            configureKafkaModule()
+            configureKafkaModule()
         )
     }
 

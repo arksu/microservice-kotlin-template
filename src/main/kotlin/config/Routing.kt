@@ -12,6 +12,8 @@ import org.koin.ktor.ext.inject
 import java.util.*
 
 fun Application.configureRouting() {
+    val helloService by inject<HelloService>()
+
     install(RequestValidation) {
         validate<String> { bodyText ->
             if (!bodyText.startsWith("Hello"))
@@ -20,8 +22,6 @@ fun Application.configureRouting() {
         }
     }
 
-    val service by inject<HelloService>()
-
     routing {
         post("/login") {
             val permissions = listOf("USERS", "POP")
@@ -29,31 +29,25 @@ fun Application.configureRouting() {
                 .withAudience("withAudience")
                 .withIssuer("iss")
                 .withClaim("username", "user1")
-                .withExpiresAt(Date(System.currentTimeMillis() + 60000000))
+                .withExpiresAt(Date(System.currentTimeMillis() + 5))
                 .withClaim("permissions", permissions)
                 .sign(Algorithm.HMAC256("secret"))
             call.respond(hashMapOf("token" to token))
         }
 
         authenticate {
-//            withPermission("USERS") {
-            withAnyRole("USERS") {
+            withAnyPermission("USERS1") {
                 get("/") {
-//                withJwtPermission("USERS") {
-                    call.respond(service.hello())
-//                }
+                    call.respond(helloService.hello())
                 }
             }
-//            }
         }
 
         get("/kafka") {
-            service.produceKafkaMessage()
+            helloService.produceKafkaMessage()
             call.respond("ok")
         }
-    }
 
-    routing {
         get("/json") {
             call.respond(mapOf("hello" to "world"))
         }

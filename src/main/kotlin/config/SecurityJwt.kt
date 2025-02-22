@@ -27,29 +27,28 @@ fun Application.configureJwtSecurity() {
                     .build()
             )
             validate { credential ->
+//                if (credential.payload.audience.contains(jwtAudience))
                 if (credential.payload.getClaim("permissions").isNull) {
                     null
                 } else {
                     JWTPrincipal(credential.payload)
                 }
-
-//                if (credential.payload.audience.contains(jwtAudience))
-//                    JWTPrincipal(credential.payload)
-//                else
-//                    null
+            }
+            challenge { _, _ ->
+                call.respond(HttpStatusCode.Unauthorized)
             }
         }
     }
 }
 
-@KtorDsl
-suspend fun RoutingContext.withJwtPermission(requiredPermission: String, build: RoutingHandler) {
-    val principal = call.principal<JWTPrincipal>()
-    val claim = principal?.payload?.getClaim("permissions")
-    val permissions = claim?.asList(String::class.java) ?: emptyList<String>()
-    if (requiredPermission !in permissions) {
-        call.respond(HttpStatusCode.Forbidden, "Forbidden: Missing permission '$requiredPermission'")
-    } else {
-        build()
-    }
-}
+//@KtorDsl
+//suspend fun RoutingContext.withJwtPermission(requiredPermission: String, build: RoutingHandler) {
+//    val principal = call.principal<JWTPrincipal>()
+//    val claim = principal?.payload?.getClaim("permissions")
+//    val permissions = claim?.asList(String::class.java) ?: emptyList<String>()
+//    if (requiredPermission !in permissions) {
+//        call.respond(HttpStatusCode.Forbidden, "Forbidden: Missing permission '$requiredPermission'")
+//    } else {
+//        build()
+//    }
+//}

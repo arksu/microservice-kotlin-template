@@ -2,12 +2,18 @@ package com.company.config
 
 import com.company.error.AuthenticationException
 import com.company.error.AuthorizationException
+import com.company.service.gson
+import com.google.gson.reflect.TypeToken
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.routing.*
+import java.lang.reflect.Type
+
 
 typealias Permission = String
+
+val listType: Type = object : TypeToken<ArrayList<String>>() {}.type
 
 class AuthConfig {
     var permissions: Set<String> = emptySet()
@@ -22,10 +28,15 @@ val RoleAuthorization = createRouteScopedPlugin(
     val type = pluginConfig.type
 
     on(AuthenticationChecked) { call ->
-        val principal = call.principal<JWTPrincipal>() ?: throw AuthenticationException()
-        val claim = principal.payload.getClaim("permissions")
-        // get permissions here <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        val permissions = (claim?.asList(String::class.java) ?: emptyList<String>()).toSet()
+        // from jwt
+//        val principal = call.principal<JWTPrincipal>() ?: throw AuthenticationException()
+//        val claim = principal.payload.getClaim("permissions")
+//        val permissions = (claim?.asList(String::class.java) ?: emptyList<String>()).toSet()
+
+        // from header
+        val header = call.request.headers["Permissions"] ?: throw AuthenticationException("No permissions in header")
+        val permissions : List<String> = gson.fromJson(header, listType)
+
         var denyReason: String? = null
 
         when (type) {

@@ -35,13 +35,13 @@ fun Application.configureRouting() {
             call.respond(hashMapOf("token" to token))
         }
 
-        authenticate {
-            withAnyPermission("USERS1") {
+//        authenticate {
+            withAnyPermission("USERS") {
                 get("/") {
                     call.respond(helloService.hello())
                 }
             }
-        }
+//        }
 
         get("/kafka") {
             helloService.produceKafkaMessage()

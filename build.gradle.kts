@@ -40,6 +40,7 @@ dependencies {
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.server.status.pages)
     implementation(libs.ktor.serialization.gson)
+    implementation(libs.ktor.serialization.jackson)
     implementation(libs.ktor.server.call.logging)
     implementation(libs.ktor.server.call.id)
     implementation(libs.ktor.server.auth)

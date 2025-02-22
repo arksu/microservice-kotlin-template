@@ -19,7 +19,6 @@ class HelloService(
 ) : KoinComponent {
 
     private val producer: KafkaProducer<Any, String> by inject(qualifier = named("stringProducer"))
-    private val producer2: KafkaProducer<Any, String> by inject(qualifier = named("intProducer"))
 
     private val charset = ('a'..'z').toList()
 
@@ -52,7 +51,6 @@ class HelloService(
         val dto = KafkaDTO(UUID.randomUUID(), "some data")
 
         producer.asyncSend("topic1", dto.id, dto)
-        producer2.asyncSend("topic2", 12, dto)
     }
 
     data class UserDTO(

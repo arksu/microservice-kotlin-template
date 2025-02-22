@@ -2,6 +2,7 @@ package com.company
 
 import com.company.config.configureKoin
 import com.company.config.configureRouting
+import com.company.config.configureJwtSecurity
 import com.company.config.configureSerialization
 import io.ktor.server.application.*
 import io.ktor.server.netty.*
@@ -14,6 +15,6 @@ fun Application.module() {
     configureSerialization()
     configureKoin()
 //    configureMonitoring()
-//    configureSecurity()
+    configureJwtSecurity()
     configureRouting()
 }

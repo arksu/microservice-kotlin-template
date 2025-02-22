@@ -17,7 +17,10 @@ fun Application.configureKoin() {
             singleOf(::SerializationService)
             singleOf(::HelloService)
         }
-        modules(module, configureKafkaModule())
+        modules(
+            module,
+//            configureKafkaModule()
+        )
     }
 
 }

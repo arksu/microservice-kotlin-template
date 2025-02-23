@@ -26,7 +26,10 @@ fun StatusPagesConfig.exceptionHandler() {
     exception<RequestValidationException> { call, cause ->
         call.respond(HttpStatusCode.BadRequest, cause.reasons.joinToString())
     }
-    exception<Throwable> { call, e ->
+    exception<dev.nesk.akkurate.ValidationResult.Exception> { call, e ->
+        call.respond(HttpStatusCode.UnprocessableEntity, e.violations)
+    }
+    exception<Exception> { call, e ->
         call.respond(HttpStatusCode.InternalServerError, e.message ?: e.javaClass.simpleName)
     }
 }

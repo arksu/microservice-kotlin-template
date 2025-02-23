@@ -1,9 +1,10 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktor)
-//    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.jooq)
     alias(libs.plugins.flyway)
+    id("com.google.devtools.ksp") version "2.1.0-1.0.29"
 }
 
 group = "com.company"
@@ -35,6 +36,7 @@ repositories {
 }
 
 dependencies {
+    ksp("dev.nesk.akkurate:akkurate-ksp-plugin:0.11.0")
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.content.negotiation)
@@ -51,6 +53,7 @@ dependencies {
     implementation(libs.koin.ktor)
     implementation(libs.koin.logger.slf4j)
     implementation(libs.kafka.clients)
+    implementation(libs.akkurate.ktor.server)
 
     implementation(libs.kotlinx.coroutines.reactor)
     implementation(libs.kotlinx.coroutines.core)

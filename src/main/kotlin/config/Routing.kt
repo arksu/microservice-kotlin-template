@@ -55,8 +55,8 @@ fun Application.configureRouting() {
 }
 
 @Validate
-@Serializable
-//@JsonIgnoreProperties(ignoreUnknown = true)
+//@Serializable
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Customer(
     val id: Int,
     val firstName: String,

@@ -2,6 +2,7 @@
 kotlin-version = "2.1.10" # https://kotlinlang.org/
 kotlinx-coroutines-version = "1.10.1" # https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-reactor
 koin-version = "4.0.2" # https://mvnrepository.com/artifact/io.insert-koin/koin-ktor
+koin-annotations-version = "2.0.0" # https://central.sonatype.com/artifact/io.insert-koin/koin-annotations
 ktor-version = "3.1.0" # https://mvnrepository.com/artifact/io.ktor/ktor-server-core
 logback-version = "1.5.16" # https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
 jooq-version = "3.19.20" # https://mvnrepository.com/artifact/org.jooq/jooq
@@ -19,6 +20,8 @@ postgres-version = "42.7.5" # https://mvnrepository.com/artifact/org.postgresql/
 
 [libraries]
 koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin-version" }
+koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin-annotations-version" }
+koin-ksp-compiler = { module = "io.insert-koin:koin-ksp-compiler", version.ref = "koin-annotations-version" }
 koin-logger-slf4j = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin-version" }
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor-version" }
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor-version" }

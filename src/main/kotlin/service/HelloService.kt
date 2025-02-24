@@ -9,11 +9,13 @@ import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitSingle
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.jooq.impl.DSL
+import org.koin.core.annotation.Single
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import java.util.*
 
+@Single
 class HelloService(
     private val database: Database,
 ) : KoinComponent {

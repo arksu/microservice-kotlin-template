@@ -1,1 +1,1 @@
-rootProject.name = "company"
+rootProject.name = "microservice-kotlin-template"

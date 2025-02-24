@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.jooq)
     alias(libs.plugins.flyway)
     alias(libs.plugins.ksp)
+    application
 }
 
 group = "com.company"
@@ -36,6 +37,8 @@ repositories {
 
 dependencies {
     ksp(libs.akkurate.ksp.plugin)
+    ksp(libs.koin.ksp.compiler)
+
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.content.negotiation)
@@ -50,6 +53,7 @@ dependencies {
     implementation(libs.ktor.server.config.yaml)
     implementation(libs.logback.classic)
     implementation(libs.koin.ktor)
+    implementation(libs.koin.annotations)
     implementation(libs.koin.logger.slf4j)
     implementation(libs.kafka.clients)
     implementation(libs.akkurate.ktor.server)

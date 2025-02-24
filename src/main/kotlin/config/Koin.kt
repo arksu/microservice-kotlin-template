@@ -1,26 +1,26 @@
 package com.company.config
 
-import com.company.service.HelloService
-import com.company.service.SerializationService
 import io.ktor.server.application.*
-import org.koin.core.module.dsl.createdAtStart
-import org.koin.core.module.dsl.singleOf
+import org.koin.core.annotation.ComponentScan
+import org.koin.core.annotation.Module
+import org.koin.dsl.module
+import org.koin.ksp.generated.module
 import org.koin.ktor.plugin.Koin
+import org.koin.logger.slf4jLogger
 
 fun Application.configureKoin() {
     install(Koin) {
-        val module = org.koin.dsl.module {
-            single { environment }
-            singleOf(::Database) {
-                createdAtStart()
-            }
-            singleOf(::SerializationService)
-            singleOf(::HelloService)
-        }
+        slf4jLogger()
         modules(
-            module,
+            module {
+                single { environment }
+            },
+            AppModule().module,
             configureKafkaModule()
         )
     }
-
 }
+
+@Module
+@ComponentScan("com.company")
+class AppModule

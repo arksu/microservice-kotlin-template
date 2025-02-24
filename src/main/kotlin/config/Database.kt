@@ -12,12 +12,14 @@ import org.flywaydb.core.Flyway
 import org.jooq.DSLContext
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
+import org.koin.core.annotation.Single
 import org.koin.core.component.KoinComponent
 import org.reactivestreams.Publisher
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.Duration
 
+@Single(createdAtStart = true)
 class Database(
     environment: ApplicationEnvironment
 ) : KoinComponent {

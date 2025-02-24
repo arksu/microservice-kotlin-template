@@ -6,7 +6,6 @@ import com.company.service.gson
 import com.google.gson.reflect.TypeToken
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
 import io.ktor.server.routing.*
 import java.lang.reflect.Type
 
@@ -35,7 +34,7 @@ val RoleAuthorization = createRouteScopedPlugin(
 
         // from header
         val header = call.request.headers["Permissions"] ?: throw AuthenticationException("No permissions in header")
-        val permissions : List<String> = gson.fromJson(header, listType)
+        val permissions: List<String> = gson.fromJson(header, listType)
 
         var denyReason: String? = null
 
@@ -61,7 +60,7 @@ val RoleAuthorization = createRouteScopedPlugin(
             AuthType.NONE -> {
                 if (permissions.any { it in requiredPermissions }) {
                     denyReason = "Principal has forbidden permission(s) ${
-                        (requiredPermissions.intersect(permissions)).joinToString(
+                        (requiredPermissions.intersect(permissions.toSet())).joinToString(
                             " and "
                         )
                     }"

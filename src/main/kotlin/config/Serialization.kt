@@ -17,11 +17,6 @@ fun Application.configureSerialization() {
 
     install(RequestValidation) {
         registerValidator(validateCustomer)
-//        validate<Customer> { customer ->
-//            if (customer.id <= 0)
-//                ValidationResult.Invalid("A customer ID should be greater than 0")
-//            else ValidationResult.Valid
-//        }
     }
 
 }

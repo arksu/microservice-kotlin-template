@@ -10,7 +10,6 @@ import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
 import java.util.*
 
@@ -48,7 +47,7 @@ fun Application.configureRouting() {
         }
 
         post("/post") {
-            val customer =  call.receive<Customer>()
+            val customer = call.receive<Customer>()
             call.respond(customer)
         }
     }

@@ -14,11 +14,11 @@ fun Application.configureExceptionHandler() {
 }
 
 fun StatusPagesConfig.exceptionHandler() {
-    exception<AuthorizationException> { call, e ->
-        call.respondText(status = HttpStatusCode.Forbidden, text = e.message ?: "Forbidden")
-    }
     exception<AuthenticationException> { call, e ->
         call.respondText(status = HttpStatusCode.Unauthorized, text = e.message ?: "Unauthorized")
+    }
+    exception<AuthorizationException> { call, e ->
+        call.respondText(status = HttpStatusCode.Forbidden, text = e.message ?: "Forbidden")
     }
     exception<BadRequestException> { call, e ->
         call.respond(HttpStatusCode.BadRequest, e.message!!)

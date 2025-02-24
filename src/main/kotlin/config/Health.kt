@@ -14,10 +14,9 @@ fun Application.configureHealth() {
             healthCheckPath = "/health"
             check("database") {
                 val db = getKoin().get<Database>()
-                val r = db.usingJooq { context ->
+                db.usingJooq { context ->
                     context.selectOne().awaitSingle()
-                }
-                r.value1() == 1
+                }.value1() == 1
             }
         }
     }
@@ -153,8 +152,6 @@ class KHealthConfiguration internal constructor() {
 
 /**
  * A builder class used to create descriptive DSL for adding checks to an endpoint.
- * @see healthChecks
- * @see readyChecks
  */
 class CheckBuilder {
     val checks = linkedSetOf<Check>()

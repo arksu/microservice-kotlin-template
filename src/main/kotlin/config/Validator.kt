@@ -13,5 +13,3 @@ val validateCustomer = dev.nesk.akkurate.Validator<Customer> {
     firstName.isNotEmpty()
     lastName.hasLengthGreaterThan(3)
 }
-
-

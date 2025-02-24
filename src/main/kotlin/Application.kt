@@ -12,8 +12,8 @@ fun main(args: Array<String>) {
 fun Application.module() {
     configureSerialization()
     configureExceptionHandler()
+    configureMonitoring()
     configureKoin()
-//    configureMonitoring()
     configureJwtSecurity()
     configureRouting()
     configureHealth()

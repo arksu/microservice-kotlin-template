@@ -16,4 +16,5 @@ fun Application.module() {
 //    configureMonitoring()
     configureJwtSecurity()
     configureRouting()
+    configureHealth()
 }

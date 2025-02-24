@@ -20,6 +20,9 @@ class ApplicationTest {
         client.get("/health").apply {
             assertEquals(HttpStatusCode.OK, status)
         }
+        client.get("/kafka").apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
     }
 
 }

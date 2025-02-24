@@ -22,6 +22,8 @@ class HelloService(
 
     private val producer: KafkaProducer<Any, String> by inject(qualifier = named("stringProducer"))
 
+    private val fooService: FooService by inject()
+
     private val charset = ('a'..'z').toList()
 
     suspend fun hello(): List<UserDTO> {
@@ -50,6 +52,7 @@ class HelloService(
     }
 
     suspend fun produceKafkaMessage() {
+        fooService.some2()
         val dto = KafkaDTO(UUID.randomUUID(), "some data")
 
         producer.asyncSend("topic1", dto.id, dto)

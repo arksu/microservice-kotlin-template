@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.company.service.HelloService
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import dev.nesk.akkurate.annotations.Validate
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.*
@@ -50,11 +51,15 @@ fun Application.configureRouting() {
             val customer = call.receive<Customer>()
             call.respond(customer)
         }
+
+        get("/foo") {
+            helloService.foo()
+            call.respond(HttpStatusCode.NoContent)
+        }
     }
 }
 
 @Validate
-//@Serializable
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Customer(
     val id: Int,

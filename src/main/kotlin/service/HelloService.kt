@@ -52,10 +52,13 @@ class HelloService(
     }
 
     suspend fun produceKafkaMessage() {
-        fooService.some2()
         val dto = KafkaDTO(UUID.randomUUID(), "some data")
 
         producer.asyncSend("topic1", dto.id, dto)
+    }
+
+    fun foo() {
+        fooService.some2()
     }
 
     data class UserDTO(

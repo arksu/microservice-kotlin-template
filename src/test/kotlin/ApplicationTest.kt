@@ -23,6 +23,9 @@ class ApplicationTest {
         client.get("/kafka").apply {
             assertEquals(HttpStatusCode.OK, status)
         }
+        client.get("/foo").apply {
+            assertEquals(HttpStatusCode.NoContent, status)
+        }
     }
 
 }

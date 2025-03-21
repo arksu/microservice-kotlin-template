@@ -1,9 +1,10 @@
 [versions]
-kotlin-version = "2.1.10" # https://kotlinlang.org/
+kotlin-version = "2.1.20" # https://kotlinlang.org/
+ksp-version = "2.1.20-1.0.31" # https://github.com/google/ksp/releases
 kotlinx-coroutines-version = "1.10.1" # https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-reactor
 koin-version = "4.0.2" # https://mvnrepository.com/artifact/io.insert-koin/koin-ktor
 koin-annotations-version = "2.0.0" # https://central.sonatype.com/artifact/io.insert-koin/koin-annotations
-ktor-version = "3.1.0" # https://mvnrepository.com/artifact/io.ktor/ktor-server-core
+ktor-version = "3.1.1" # https://mvnrepository.com/artifact/io.ktor/ktor-server-core
 logback-version = "1.5.16" # https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
 jooq-version = "3.19.20" # https://mvnrepository.com/artifact/org.jooq/jooq
 jooq-plugin-version = "9.0" #  https://plugins.gradle.org/plugin/nu.studer.jooq
@@ -13,7 +14,6 @@ r2dbc-version = "1.0.2.RELEASE" # https://github.com/r2dbc/r2dbc-pool
 r2dbc-postgresql-version = "1.0.7.RELEASE" # https://mvnrepository.com/artifact/org.postgresql/r2dbc-postgresql
 kafka-clients-version = "3.9.0" # https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients
 akkurate-version = "0.11.0" # https://mvnrepository.com/artifact/dev.nesk.akkurate/akkurate-ktor-server
-ksp-version = "2.1.10-1.0.29" # https://github.com/google/ksp/releases
 
 #mariadb-java-client-version = "3.5.2" # https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client
 postgres-version = "42.7.5" # https://mvnrepository.com/artifact/org.postgresql/postgresql

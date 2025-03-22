@@ -6,7 +6,7 @@ ktor:
     port: 7056
 
 db:
-#  url: "jdbc:mariadb://localhost:3409/project_name"
+  #  url: "jdbc:mariadb://localhost:3409/project_name"
   url: "jdbc:postgresql://localhost:5332/project_name"
   user: project_name
   password: project_name
@@ -25,7 +25,7 @@ kafka:
       keySerializer: "org.apache.kafka.common.serialization.StringSerializer"
       valueSerializer: "org.apache.kafka.common.serialization.StringSerializer"
       acks: all
-#    intProducer:
-#      topic: "topic1"
-#      keySerializer: "org.apache.kafka.common.serialization.IntegerSerializer"
-#      valueSerializer: "org.apache.kafka.common.serialization.StringSerializer"
+    intProducer:
+      topic: "topic2"
+      keySerializer: "org.apache.kafka.common.serialization.IntegerSerializer"
+      valueSerializer: "org.apache.kafka.common.serialization.StringSerializer"

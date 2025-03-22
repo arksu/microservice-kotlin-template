@@ -1,6 +1,7 @@
 package com.company.config
 
 import com.company.service.gson
+import com.company.service.kafka.IConsumer
 import io.ktor.server.application.*
 import io.ktor.server.config.*
 import kotlinx.coroutines.*
@@ -13,6 +14,7 @@ import org.apache.kafka.clients.producer.RecordMetadata
 import org.apache.kafka.common.errors.WakeupException
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
+import org.koin.ktor.ext.getKoin
 import java.time.Duration
 import java.util.*
 import kotlin.coroutines.resume
@@ -49,6 +51,7 @@ fun Application.configureKafkaModule(): Module {
 
     val jobsMap = HashMap<String, Job>()
     val consumersMap = HashMap<String, KafkaConsumer<String, String>>()
+    val consumersImplMap = HashMap<String, IConsumer>()
     consumerConfigs.forEach { (name, config) ->
         val consumerProps = Properties().apply {
             put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaGlobalConfig.property("bootstrapServers").getList())
@@ -60,6 +63,7 @@ fun Application.configureKafkaModule(): Module {
                 put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, it.getString())
             }
         }
+        // TODO int deserializer
         val consumer = KafkaConsumer<String, String>(consumerProps)
         consumer.subscribe(listOf(config.property("topic").getString()))
 
@@ -67,9 +71,13 @@ fun Application.configureKafkaModule(): Module {
             try {
                 while (isActive) {
                     val records = consumer.poll(Duration.ofMillis(100))
-                    for (record in records) {
-//                        println("Consumed message: key=${record.key()}, value=${record.value()}, offset=${record.offset()}")
-                        // TODO Add any processing logic here.
+                    if (!records.isEmpty) {
+                        val consumerImpl = consumersImplMap.computeIfAbsent(name) {
+                            getKoin().get<IConsumer>(qualifier = named(name))
+                        }
+                        for (record in records) {
+                            consumerImpl.processMessage(record)
+                        }
                     }
                 }
             } catch (_: WakeupException) {

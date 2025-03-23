@@ -5,6 +5,12 @@ import com.company.config.asyncSend
 import com.company.config.toFlux
 import com.company.config.toMono
 import com.company.jooq.tables.references.USERS
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import de.jensklingenberg.ktorfit.Ktorfit
+import de.jensklingenberg.ktorfit.http.GET
+import io.ktor.client.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.jackson.*
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitSingle
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -57,10 +63,6 @@ class HelloService(
         producer.asyncSend("topic1", dto.id, dto)
     }
 
-    fun foo() {
-        fooService.some2()
-    }
-
     data class UserDTO(
         val id: Long,
         val name: String,
@@ -70,4 +72,36 @@ class HelloService(
         val id: UUID,
         val payload: String,
     )
+
+    fun foo() {
+        fooService.some2()
+    }
+
+    private val httpClient = HttpClient {
+        install(ContentNegotiation) {
+            jackson()
+        }
+    }
+
+    private val ktorfit = Ktorfit.Builder()
+        .httpClient(httpClient)
+        .build()
+
+    suspend fun ktorfit(): List<Coffee> {
+        val api = ktorfit.createExampleApi()
+        val l = api.getCoffee()
+        return l
+    }
+}
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Coffee(
+    val title: String,
+    val ingredients: List<String>,
+    val id: Int
+)
+
+interface ExampleApi {
+    @GET("https://api.sampleapis.com/coffee/hot")
+    suspend fun getCoffee(): List<Coffee>
 }

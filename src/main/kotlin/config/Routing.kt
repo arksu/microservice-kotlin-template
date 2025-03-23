@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.company.service.HelloService
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import de.jensklingenberg.ktorfit.http.GET
 import dev.nesk.akkurate.annotations.Validate
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -55,6 +56,11 @@ fun Application.configureRouting() {
         get("/foo") {
             helloService.foo()
             call.respond(HttpStatusCode.NoContent)
+        }
+
+        get("ktorfit") {
+            val resp = helloService.ktorfit()
+            call.respond(resp)
         }
     }
 }

@@ -6,11 +6,7 @@ import com.company.config.toFlux
 import com.company.config.toMono
 import com.company.jooq.tables.references.USERS
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import de.jensklingenberg.ktorfit.Ktorfit
 import de.jensklingenberg.ktorfit.http.GET
-import io.ktor.client.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.serialization.jackson.*
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitSingle
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -24,11 +20,11 @@ import java.util.*
 @Single
 class HelloService(
     private val database: Database,
+    private val exampleApi: ExampleApi,
+    private val fooService: FooService,
 ) : KoinComponent {
 
     private val producer: KafkaProducer<Any, String> by inject(qualifier = named("stringProducer"))
-
-    private val fooService: FooService by inject()
 
     private val charset = ('a'..'z').toList()
 
@@ -77,20 +73,8 @@ class HelloService(
         fooService.some2()
     }
 
-    private val httpClient = HttpClient {
-        install(ContentNegotiation) {
-            jackson()
-        }
-    }
-
-    private val ktorfit = Ktorfit.Builder()
-        .httpClient(httpClient)
-        .build()
-
     suspend fun ktorfit(): List<Coffee> {
-        val api = ktorfit.createExampleApi()
-        val l = api.getCoffee()
-        return l
+        return exampleApi.getCoffee()
     }
 }
 

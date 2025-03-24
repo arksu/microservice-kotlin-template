@@ -16,7 +16,8 @@ fun Application.configureKoin() {
                 single { environment }
             },
             AppModule().module,
-            configureKafkaModule()
+            configureKafkaModule(),
+            configureKtorfitModule(),
         )
     }
 }

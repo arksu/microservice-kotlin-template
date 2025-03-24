@@ -2,10 +2,8 @@ package com.company.config
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.company.service.Customer
 import com.company.service.HelloService
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import de.jensklingenberg.ktorfit.http.GET
-import dev.nesk.akkurate.annotations.Validate
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -32,7 +30,7 @@ fun Application.configureRouting() {
         }
 
         authenticate {
-            withAnyPermission("USERS") {
+            withAnyPermission("GET_USERS") {
                 get("/") {
                     call.respond(helloService.hello())
                 }
@@ -64,11 +62,3 @@ fun Application.configureRouting() {
         }
     }
 }
-
-@Validate
-@JsonIgnoreProperties(ignoreUnknown = true)
-data class Customer(
-    val id: Int,
-    val firstName: String,
-    val lastName: String
-)

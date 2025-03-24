@@ -7,6 +7,7 @@ import com.company.config.toMono
 import com.company.jooq.tables.references.USERS
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import de.jensklingenberg.ktorfit.http.GET
+import dev.nesk.akkurate.annotations.Validate
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitSingle
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -89,3 +90,11 @@ interface ExampleApi {
     @GET("https://api.sampleapis.com/coffee/hot")
     suspend fun getCoffee(): List<Coffee>
 }
+
+@Validate
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class Customer(
+    val id: Int,
+    val firstName: String,
+    val lastName: String
+)

@@ -64,13 +64,13 @@ fun Application.configureKafkaModule(): Module {
             }
         }
         // TODO int deserializer
-        val consumer = KafkaConsumer<String, String>(consumerProps)
-        consumer.subscribe(listOf(config.property("topic").getString()))
+        val kafkaConsumer = KafkaConsumer<String, String>(consumerProps)
+        kafkaConsumer.subscribe(listOf(config.property("topic").getString()))
 
         val job = launch(Dispatchers.IO) {
             try {
                 while (isActive) {
-                    val records = consumer.poll(Duration.ofMillis(100))
+                    val records = kafkaConsumer.poll(Duration.ofMillis(100))
                     if (!records.isEmpty) {
                         val consumerImpl = consumersImplMap.computeIfAbsent(name) {
                             getKoin().get<IConsumer>(qualifier = named(name))
@@ -82,10 +82,10 @@ fun Application.configureKafkaModule(): Module {
                 }
             } catch (_: WakeupException) {
             } finally {
-                consumer.close()
+                kafkaConsumer.close()
             }
         }
-        consumersMap[name] = consumer
+        consumersMap[name] = kafkaConsumer
         jobsMap[name] = job
     }
 

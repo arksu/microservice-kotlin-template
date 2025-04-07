@@ -24,7 +24,7 @@ class Database(
     environment: ApplicationEnvironment
 ) : KoinComponent {
 
-//    val dialect = SQLDialect.MARIADB
+    //    val dialect = SQLDialect.MARIADB
     val dialect = SQLDialect.POSTGRES
 
     val url = environment.config.propertyOrNull("db.url")?.getString() ?: throw RuntimeException("db.url is not set")
@@ -56,6 +56,14 @@ class Database(
     private val connectionPool = createConnectionPool()
 
     private val flyway = Flyway.configure(this.javaClass.classLoader)
+        .let { fl ->
+            val schema = environment.config.propertyOrNull("db.schema")?.getString()
+            if (!schema.isNullOrBlank()) {
+                fl.schemas(schema)
+            } else {
+                fl
+            }
+        }
         .validateMigrationNaming(true)
         .executeInTransaction(true)
         .dataSource(url, user, password)

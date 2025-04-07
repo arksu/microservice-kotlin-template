@@ -10,6 +10,7 @@ db:
   url: "jdbc:postgresql://localhost:5332/project_name"
   user: project_name
   password: project_name
+  schema: project_name
 
 kafka:
   bootstrapServers: [ "localhost:9092" ]

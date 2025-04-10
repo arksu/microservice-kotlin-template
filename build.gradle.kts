@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.flyway)
     alias(libs.plugins.ksp)
     alias(libs.plugins.ktorfit)
-//    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kotlin.serialization)
     application
 }
 
@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.ktor.server.auth.jwt)
     implementation(libs.ktor.server.request.validation)
     implementation(libs.ktor.server.config.yaml)
+    implementation(libs.ktor.server.resources)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.logback.classic)
     implementation(libs.koin.ktor)

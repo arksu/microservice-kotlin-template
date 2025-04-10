@@ -35,6 +35,7 @@ ktor-server-status-pages = { module = "io.ktor:ktor-server-status-pages", versio
 ktor-server-auth-jwt = { module = "io.ktor:ktor-server-auth-jwt", version.ref = "ktor-version" }
 ktor-server-request-validation = { module = "io.ktor:ktor-server-request-validation", version.ref = "ktor-version" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor-version" }
+ktor-server-resources = { module = "io.ktor:ktor-server-resources", version.ref = "ktor-version" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor-version" }
 akkurate-ktor-server = { module = "dev.nesk.akkurate:akkurate-ktor-server", version.ref = "akkurate-version" }
 akkurate-ksp-plugin = { module = "dev.nesk.akkurate:akkurate-ksp-plugin", version.ref = "akkurate-version" }

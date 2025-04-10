@@ -1,5 +1,6 @@
 package com.company.routes
 
+import com.company.config.UUIDSerializer
 import com.company.service.Customer
 import com.company.service.HelloService
 import io.ktor.http.*
@@ -11,6 +12,7 @@ import io.ktor.server.resources.post
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
+import java.util.*
 
 fun Application.hello() {
     val helloService by inject<HelloService>()
@@ -27,6 +29,12 @@ fun Application.hello() {
             // Save an article ...
             call.respondText("An article is saved", status = HttpStatusCode.Created)
         }
+
+        get<Articles.Id> { article ->
+            // Show an article with id ${article.id} ...
+            call.respondText("An article with id ${article.id}", status = HttpStatusCode.OK)
+        }
+
 
         get("/kafka") {
             helloService.produceKafkaMessage()
@@ -55,13 +63,19 @@ fun Application.hello() {
 }
 
 @Resource("/articles")
-class Articles(val sort: String? = "new") {
+class Articles(
+    val sort: String? = "new"
+) {
 
     @Resource("new")
     class New(val parent: Articles = Articles())
 
     @Resource("{id}")
-    class Id(val parent: Articles = Articles(), val id: Long) {
+    class Id(
+        val parent: Articles = Articles(),
+        @kotlinx.serialization.Serializable(with = UUIDSerializer::class)
+        val id: UUID
+    ) {
         @Resource("edit")
         class Edit(val parent: Id)
     }

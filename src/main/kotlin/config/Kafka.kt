@@ -58,6 +58,7 @@ fun Application.configureKafkaModule(): Module {
             put(ConsumerConfig.GROUP_ID_CONFIG, kafkaGlobalConfig.property("groupId").getString())
             put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, config.property("keyDeserializer").getString())
             put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, config.property("valueDeserializer").getString())
+            put(ConsumerConfig.ENABLE_METRICS_PUSH_CONFIG, "false")
 
             config.propertyOrNull("autoOffsetReset")?.let {
                 put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, it.getString())

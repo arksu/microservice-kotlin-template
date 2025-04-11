@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.kafka.clients)
     implementation(libs.akkurate.ktor.server)
     implementation(libs.ktorfit)
+    implementation(libs.ktor.server.task.scheduling.redis)
 
     implementation(libs.kotlinx.coroutines.reactor)
     implementation(libs.kotlinx.coroutines.core)

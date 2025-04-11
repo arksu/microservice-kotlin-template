@@ -15,6 +15,7 @@ r2dbc-postgresql-version = "1.0.7.RELEASE" # https://mvnrepository.com/artifact/
 kafka-clients-version = "3.9.0" # https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients
 akkurate-version = "0.11.0" # https://mvnrepository.com/artifact/dev.nesk.akkurate/akkurate-ktor-server
 ktorfit-version = "2.4.1" # https://github.com/Foso/Ktorfit
+ktor-plugins-version = "2.1.2" # https://mvnrepository.com/artifact/io.github.flaxoos/ktor-server-task-scheduling
 
 #mariadb-java-client-version = "3.5.2" # https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client
 postgres-version = "42.7.5" # https://mvnrepository.com/artifact/org.postgresql/postgresql
@@ -36,6 +37,7 @@ ktor-server-auth-jwt = { module = "io.ktor:ktor-server-auth-jwt", version.ref = 
 ktor-server-request-validation = { module = "io.ktor:ktor-server-request-validation", version.ref = "ktor-version" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor-version" }
 ktor-server-resources = { module = "io.ktor:ktor-server-resources", version.ref = "ktor-version" }
+ktor-server-task-scheduling-redis = { module = "io.github.flaxoos:ktor-server-task-scheduling-redis", version.ref = "ktor-plugins-version" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor-version" }
 akkurate-ktor-server = { module = "dev.nesk.akkurate:akkurate-ktor-server", version.ref = "akkurate-version" }
 akkurate-ksp-plugin = { module = "dev.nesk.akkurate:akkurate-ksp-plugin", version.ref = "akkurate-version" }

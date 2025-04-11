@@ -1,11 +1,15 @@
 package com.company.routes
 
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 import com.company.config.UUIDSerializer
+import com.company.config.withAnyPermission
 import com.company.service.Customer
 import com.company.service.HelloService
 import io.ktor.http.*
 import io.ktor.resources.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.resources.*
 import io.ktor.server.resources.post
@@ -18,6 +22,26 @@ fun Application.hello() {
     val helloService by inject<HelloService>()
 
     routing {
+        post("/login") {
+            val permissions = listOf("USERS", "POP")
+            val token = JWT.create()
+                .withAudience("withAudience")
+                .withIssuer("iss")
+                .withClaim("username", "user1")
+                .withExpiresAt(Date(System.currentTimeMillis() + 500000000))
+                .withClaim("permissions", permissions)
+                .sign(Algorithm.HMAC256("secret"))
+            call.respond(hashMapOf("token" to token))
+        }
+
+        authenticate {
+            withAnyPermission("GET_USERS") {
+                get("/") {
+                    call.respond(helloService.hello())
+                }
+            }
+        }
+
         get<Articles> { article ->
             // Get all articles ...
             call.respondText("List of articles sorted starting from ${article.sort}")

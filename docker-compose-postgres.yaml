@@ -14,7 +14,19 @@ services:
     ports:
       - 5332:5432
 
+  redis:
+    image: redis:7.4-alpine
+    container_name: project_name-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
 volumes:
   postgres:
     name: project_name-db
+    driver: local
+  redis_data:
+    name: project_name-redis
     driver: local

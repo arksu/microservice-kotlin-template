@@ -20,6 +20,9 @@ fun StatusPagesConfig.exceptionHandler() {
     exception<AuthorizationException> { call, e ->
         call.respondText(status = HttpStatusCode.Forbidden, text = e.message ?: "Forbidden")
     }
+    exception<NotFoundException> { call, e ->
+        call.respond(HttpStatusCode.NotFound, e.message!!)
+    }
     exception<BadRequestException> { call, e ->
         call.respond(HttpStatusCode.BadRequest, e.message!!)
     }

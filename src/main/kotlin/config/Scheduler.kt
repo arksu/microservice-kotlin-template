@@ -1,5 +1,7 @@
 package com.company.config
 
+import com.company.util.getValue
+import com.company.util.getValueInt
 import io.github.flaxoos.ktor.server.plugins.taskscheduling.TaskScheduling
 import io.github.flaxoos.ktor.server.plugins.taskscheduling.TaskSchedulingConfiguration
 import io.github.flaxoos.ktor.server.plugins.taskscheduling.managers.lock.redis.redis
@@ -8,8 +10,8 @@ import io.ktor.server.application.*
 fun Application.configureScheduler() {
     install(TaskScheduling) {
         redis {
-            host = "localhost"
-            port = 6379
+            host = environment.getValue("redis.host")
+            port = environment.getValueInt("redis.port")
         }
         task1()
     }

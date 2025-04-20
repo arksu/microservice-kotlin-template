@@ -1,5 +1,6 @@
 package com.company.config
 
+import com.company.util.getValue
 import io.ktor.server.application.*
 import io.r2dbc.pool.ConnectionPool
 import io.r2dbc.pool.ConnectionPoolConfiguration
@@ -27,9 +28,9 @@ class Database(
     //    val dialect = SQLDialect.MARIADB
     val dialect = SQLDialect.POSTGRES
 
-    val url = environment.config.propertyOrNull("db.url")?.getString() ?: throw RuntimeException("db.url is not set")
-    val user = environment.config.propertyOrNull("db.user")?.getString() ?: throw RuntimeException("db.user is not set")
-    val password = environment.config.propertyOrNull("db.password")?.getString() ?: throw RuntimeException("db.password is not set")
+    val url = environment.getValue("db.url")
+    val user = environment.getValue("db.user")
+    val password = environment.getValue("db.password")
 
     private fun createConnectionPool(): ConnectionPool {
         val r2dbcUrl = url.replace("jdbc", "r2dbc")

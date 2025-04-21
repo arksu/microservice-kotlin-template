@@ -1,15 +1,17 @@
 package com.company.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import org.koin.core.annotation.Single
-import org.koin.core.component.KoinComponent
 
 val gson: Gson = GsonBuilder()
     .create()
 
 @Single
-class SerializationService : KoinComponent {
+class SerializationService(
+    private val objectMapper: ObjectMapper
+) {
     private
 
     fun writeValueAsString(value: Any): String {

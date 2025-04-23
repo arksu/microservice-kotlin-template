@@ -7,10 +7,12 @@ import com.google.gson.reflect.TypeToken
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
+import io.ktor.util.*
 import java.lang.reflect.Type
 
-
 typealias Permission = String
+
+internal val UserIdKey = AttributeKey<Long>("RoleAuthorization.userId")
 
 val listType: Type = object : TypeToken<ArrayList<String>>() {}.type
 
@@ -27,14 +29,12 @@ val RoleAuthorization = createRouteScopedPlugin(
     val type = pluginConfig.type
 
     on(AuthenticationChecked) { call ->
-        // from jwt
-//        val principal = call.principal<JWTPrincipal>() ?: throw AuthenticationException()
-//        val claim = principal.payload.getClaim("permissions")
-//        val permissions = (claim?.asList(String::class.java) ?: emptyList<String>()).toSet()
+        val userIdHeader = call.request.headers["UserId"] ?: "-1"
+        val userId = userIdHeader.toLong()
+        call.attributes.put(UserIdKey, userId)
 
-        // from header
-        val header = call.request.headers["Permissions"] ?: throw AuthenticationException("No permissions in header")
-        val permissions: List<String> = gson.fromJson(header, listType)
+        val permissionsHeader = call.request.headers["Permissions"] ?: throw AuthenticationException("No permissions in header")
+        val permissions: Set<String> = gson.fromJson<List<String>?>(permissionsHeader, listType).toSet()
 
         var denyReason: String? = null
 
@@ -53,7 +53,6 @@ val RoleAuthorization = createRouteScopedPlugin(
                             " or "
                         )
                     }"
-
                 }
             }
 
@@ -64,7 +63,6 @@ val RoleAuthorization = createRouteScopedPlugin(
                             " and "
                         )
                     }"
-
                 }
             }
         }

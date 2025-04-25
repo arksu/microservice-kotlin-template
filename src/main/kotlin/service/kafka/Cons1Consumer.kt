@@ -9,7 +9,7 @@ import org.koin.core.component.KoinComponent
 @Qualifier(name = "cons1")
 class Cons1Consumer : IConsumer, KoinComponent {
 
-    override fun processMessage(record: ConsumerRecord<String, String>) {
+    override suspend fun processMessage(record: ConsumerRecord<String, String>) {
         println("Consumed message: key=${record.key()}, value=${record.value()}, offset=${record.offset()}")
         println(record.value())
     }

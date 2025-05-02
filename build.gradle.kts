@@ -19,16 +19,27 @@ application {
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 
-ktor {
-    fatJar {
-        archiveFileName.set("app.jar")
-    }
-}
-
 tasks {
-    shadowJar {
-        // нужно для flyway, иначе затираются плагины и не проходят валидацию имена миграций
-        mergeServiceFiles()
+    named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+        enabled = false
+    }
+
+    named<Jar>("jar") {
+        archiveBaseName.set("app")
+        archiveVersion.set("")
+        manifest {
+            attributes["Main-Class"] = application.mainClass.get()
+        }
+        from(sourceSets.main.get().output)
+    }
+
+    register<Copy>("copyRuntimeLibs") {
+        from(configurations.runtimeClasspath)
+        into("${layout.buildDirectory.get()}/libs/lib")
+    }
+
+    named("jar") {
+        dependsOn("copyRuntimeLibs")
     }
 }
 

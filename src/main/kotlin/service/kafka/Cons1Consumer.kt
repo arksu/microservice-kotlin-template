@@ -1,5 +1,6 @@
 package com.company.service.kafka
 
+import com.company.config.IConsumer
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.koin.core.annotation.Qualifier
 import org.koin.core.annotation.Single

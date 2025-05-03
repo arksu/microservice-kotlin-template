@@ -2,9 +2,7 @@ package com.company.service
 
 import com.company.config.Database
 import com.company.config.asyncSend
-import com.company.config.toFlux
-import com.company.config.toMono
-import com.company.jooq.tables.references.USERS
+import com.company.repository.UserRepo
 import com.company.service.validation.accessors.firstName
 import com.company.service.validation.accessors.id
 import com.company.service.validation.accessors.lastName
@@ -14,10 +12,7 @@ import dev.nesk.akkurate.annotations.Validate
 import dev.nesk.akkurate.constraints.builders.hasLengthGreaterThan
 import dev.nesk.akkurate.constraints.builders.isGreaterThan
 import dev.nesk.akkurate.constraints.builders.isNotEmpty
-import kotlinx.coroutines.reactive.awaitFirstOrNull
-import kotlinx.coroutines.reactive.awaitSingle
 import org.apache.kafka.clients.producer.KafkaProducer
-import org.jooq.impl.DSL
 import org.koin.core.annotation.Single
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -27,6 +22,7 @@ import java.util.*
 @Single
 class HelloService(
     private val database: Database,
+    private val userRepo: UserRepo,
     private val exampleApi: ExampleApi,
     private val fooService: FooService,
 ) : KoinComponent {
@@ -40,22 +36,10 @@ class HelloService(
             .map { charset.random() }
             .joinToString("")
 
-        val list = database.transactionalJooq { context ->
-
-            context.insertInto(USERS)
-                .set(USERS.NAME, name)
-                .toMono()
-                .awaitFirstOrNull()
-
-            context.selectFrom(USERS)
-                .where(DSL.lower(USERS.NAME).like("%g%d%w%"))
-                .orderBy(USERS.CREATED.desc())
-                .limit(5)
-                .toFlux()
-                .collectList()
-                .awaitSingle()
+        val userRecords = database.transactionalJooq { context ->
+            userRepo.insertAndFindUsers(name, context)
         }
-        return list.map {
+        return userRecords.map {
             UserDTO(it.id!!, it.name)
         }
     }
@@ -104,6 +88,7 @@ data class Customer(
     val firstName: String,
     val lastName: String
 )
+
 val validateCustomer = dev.nesk.akkurate.Validator<Customer> {
     id.isGreaterThan(10)
     firstName.isNotEmpty()

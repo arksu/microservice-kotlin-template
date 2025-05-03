@@ -18,7 +18,7 @@ import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 import java.util.*
 
-fun Application.hello() {
+fun Application.api() {
     val helloService by inject<HelloService>()
 
     routing {

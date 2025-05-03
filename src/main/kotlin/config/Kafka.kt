@@ -1,11 +1,11 @@
 package com.company.config
 
 import com.company.service.gson
-import com.company.service.kafka.IConsumer
 import io.ktor.server.application.*
 import io.ktor.server.config.*
 import kotlinx.coroutines.*
 import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerConfig
@@ -133,6 +133,11 @@ suspend fun KafkaProducer<Any, String>.asyncSend(topic: String, key: Any, messag
     return asyncSend(record)
 }
 
+suspend fun KafkaProducer<Any, String>.asyncSend(topic: String, key: String, message: String): RecordMetadata {
+    val record: ProducerRecord<Any, String> = ProducerRecord(topic, key, message)
+    return asyncSend(record)
+}
+
 suspend fun <K, V> KafkaProducer<K, V>.asyncSend(record: ProducerRecord<K, V>): RecordMetadata {
     return withContext(Dispatchers.IO) {
         suspendCancellableCoroutine { cont ->
@@ -145,4 +150,8 @@ suspend fun <K, V> KafkaProducer<K, V>.asyncSend(record: ProducerRecord<K, V>): 
             }
         }
     }
+}
+
+interface IConsumer {
+    suspend fun processMessage(record: ConsumerRecord<String, String>)
 }

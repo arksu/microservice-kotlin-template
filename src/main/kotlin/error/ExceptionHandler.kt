@@ -33,6 +33,7 @@ fun StatusPagesConfig.exceptionHandler() {
         call.respond(HttpStatusCode.UnprocessableEntity, e.violations)
     }
     exception<Exception> { call, e ->
+        call.application.log.error("${e.message}", e)
         call.respond(HttpStatusCode.InternalServerError, e.message ?: e.javaClass.simpleName)
     }
 }

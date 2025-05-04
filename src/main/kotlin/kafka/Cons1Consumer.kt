@@ -1,4 +1,4 @@
-package com.company.service.kafka
+package com.company.kafka
 
 import com.company.config.IConsumer
 import org.apache.kafka.clients.consumer.ConsumerRecord

@@ -17,6 +17,7 @@ services:
   redis:
     image: redis:7.4-alpine
     container_name: project_name-redis
+    restart: unless-stopped
     ports:
       - "6384:6379"
     volumes:

@@ -1,11 +1,13 @@
 package com.company.config
 
-import com.company.util.getValue
+import com.company.util.getValueInt
+import com.company.util.getValueString
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 import io.ktor.server.application.*
 import io.r2dbc.pool.ConnectionPool
 import io.r2dbc.pool.ConnectionPoolConfiguration
 import io.r2dbc.spi.ConnectionFactories
-import io.r2dbc.spi.ConnectionFactoryOptions
 import io.r2dbc.spi.ConnectionFactoryOptions.*
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitSingle
@@ -15,64 +17,74 @@ import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import org.koin.core.annotation.Single
 import org.koin.core.component.KoinComponent
+import org.koin.dsl.module
 import org.reactivestreams.Publisher
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.Duration
+import javax.sql.DataSource
 
-@Single(createdAtStart = true)
-class Database(
-    environment: ApplicationEnvironment
-) : KoinComponent {
+fun databaseModule(environment: ApplicationEnvironment) = module {
+    val url = environment.getValueString("db.url")
+    val user = environment.getValueString("db.user")
+    val dbPassword = environment.getValueString("db.password")
+    val schema = environment.getValueString("db.schema", "public")
+    val r2dbcUrl = url.replace("jdbc", "r2dbc")
+    val poolMaxSize = environment.getValueInt("db.poolMaxSize", 20)
+    val poolInitialSize = environment.getValueInt("db.poolInitialSize", 20)
+    val maxIdleTime = environment.getValueInt("db.maxIdleTime", 30)
+    val connectionTimeout = environment.getValueInt("db.connectTimeout", 3)
+    val statementTimeout = environment.getValueInt("db.statementTimeout", 20)
+    val lockWaitTimeout = environment.getValueInt("db.lockWaitTimeout", 5)
 
-    //    val dialect = SQLDialect.MARIADB
-    val dialect = SQLDialect.POSTGRES
-
-    val url = environment.getValue("db.url")
-    val user = environment.getValue("db.user")
-    val password = environment.getValue("db.password")
-
-    private fun createConnectionPool(): ConnectionPool {
-        val r2dbcUrl = url.replace("jdbc", "r2dbc")
-        val options = ConnectionFactoryOptions.parse(r2dbcUrl).mutate()
+    single<ConnectionPool> {
+        val options = parse(r2dbcUrl).mutate()
             .option(DRIVER, "pool")
 //            .option(PROTOCOL, "mysql")
             .option(PROTOCOL, "postgresql")
             .option(USER, user)
-            .option(PASSWORD, password)
-            .option(CONNECT_TIMEOUT, Duration.ofSeconds(3))
-            .option(STATEMENT_TIMEOUT, Duration.ofSeconds(20))
-            .option(LOCK_WAIT_TIMEOUT, Duration.ofSeconds(5))
+            .option(PASSWORD, dbPassword)
+            .option(CONNECT_TIMEOUT, Duration.ofSeconds(connectionTimeout.toLong()))
+            .option(STATEMENT_TIMEOUT, Duration.ofSeconds(statementTimeout.toLong()))
+            .option(LOCK_WAIT_TIMEOUT, Duration.ofSeconds(lockWaitTimeout.toLong()))
             .build()
 
         val connectionFactory = ConnectionFactories.get(options)
         val poolConfig = ConnectionPoolConfiguration.builder(connectionFactory)
-            .maxSize(20)
-            .initialSize(20)
-            .maxIdleTime(Duration.ofMinutes(30))
+            .maxSize(poolMaxSize)
+            .initialSize(poolInitialSize)
+            .maxIdleTime(Duration.ofSeconds(maxIdleTime.toLong()))
             .build()
-        return ConnectionPool(poolConfig)
+        ConnectionPool(poolConfig)
     }
 
-    private val connectionPool = createConnectionPool()
-
-    private val flyway = Flyway.configure(this.javaClass.classLoader)
-        .let { fl ->
-            val schema = environment.config.propertyOrNull("db.schema")?.getString()
-            if (!schema.isNullOrBlank()) {
-                fl.schemas(schema)
-            } else {
-                fl
-            }
+    single<DataSource> {
+        val config = HikariConfig().apply {
+            jdbcUrl = url
+            username = user
+            password = dbPassword
+            driverClassName = "org.postgresql.Driver"
+            maximumPoolSize = 2
         }
-        .validateMigrationNaming(true)
-        .executeInTransaction(true)
-        .dataSource(url, user, password)
-        .load()
-
-    init {
-        flyway.migrate()
+        HikariDataSource(config)
     }
+
+    single<Flyway> {
+        Flyway.configure()
+            .dataSource(get<DataSource>())
+            .schemas(schema)
+            .locations("classpath:db/migration")
+            .load()
+    }
+}
+
+@Single(createdAtStart = true)
+class Database(
+    val connectionPool: ConnectionPool
+) : KoinComponent {
+
+    //    val dialect = SQLDialect.MARIADB
+    val dialect = SQLDialect.POSTGRES
 
     /**
      * Acquires a connection from the pool, creates a jOOQ DSLContext, executes the provided block,

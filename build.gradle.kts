@@ -73,7 +73,6 @@ dependencies {
     implementation(libs.kafka.clients)
     implementation(libs.akkurate.ktor.server)
     implementation(libs.ktorfit)
-    implementation(libs.ktor.server.task.scheduling.redis)
 
     implementation(libs.kotlinx.coroutines.reactor)
     implementation(libs.kotlinx.coroutines.core)
@@ -89,6 +88,9 @@ dependencies {
     runtimeOnly(libs.postgres)
 //    jooqGenerator(libs.mariadb.java.client)
     jooqGenerator(libs.postgres)
+
+    implementation("com.zaxxer:HikariCP:7.0.2")
+    implementation("com.github.kagkarlsson:db-scheduler:16.2.0")
 
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)

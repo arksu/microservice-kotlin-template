@@ -1,32 +1,25 @@
 package com.company.config
 
-import com.company.util.getValue
-import com.company.util.getValueInt
-import io.github.flaxoos.ktor.server.plugins.taskscheduling.TaskScheduling
-import io.github.flaxoos.ktor.server.plugins.taskscheduling.TaskSchedulingConfiguration
-import io.github.flaxoos.ktor.server.plugins.taskscheduling.managers.lock.redis.redis
-import io.ktor.server.application.*
+import com.github.kagkarlsson.scheduler.Scheduler
+import com.github.kagkarlsson.scheduler.task.helper.RecurringTask
+import org.koin.dsl.module
+import java.time.Duration
+import javax.sql.DataSource
 
-fun Application.configureScheduler() {
-    install(TaskScheduling) {
-        redis {
-            host = environment.getValue("redis.host")
-            port = environment.getValueInt("redis.port")
-        }
-        task1()
+val dbScheduler = module {
+    single<Scheduler>(createdAtStart = true) {
+        val dataSource: DataSource = get<DataSource>()
+        val jobs: List<SchedulerJob> = getAll()
+        val tasks = jobs.map { it.task }
+
+        Scheduler.create(dataSource)
+            .startTasks(tasks)
+            .threads(4)
+            .pollingInterval(Duration.ofSeconds(1))
+            .build()
     }
 }
 
-private fun TaskSchedulingConfiguration.task1() {
-    task {
-        name = "Test1"
-        task = { taskExecutionTime ->
-            log.info("Test1 task is running: $taskExecutionTime")
-        }
-        kronSchedule = {
-            seconds {
-                from(0) every 3
-            }
-        }
-    }
+interface SchedulerJob {
+    val task: RecurringTask<*>
 }

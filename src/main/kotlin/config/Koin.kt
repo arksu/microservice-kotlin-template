@@ -20,6 +20,8 @@ fun Application.configureKoin() {
                 single { objectMapper }
             },
             AppModule().module,
+            databaseModule(environment),
+            dbScheduler,
             configureKafkaModule(),
             configureKtorfitModule(),
         )

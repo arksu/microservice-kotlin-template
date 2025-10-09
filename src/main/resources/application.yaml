@@ -3,7 +3,7 @@ ktor:
     modules:
       - com.company.ApplicationKt.module
   deployment:
-    port: 7056
+    port: 7032
 
 db:
   #  url: "jdbc:mariadb://localhost:3409/project_name"

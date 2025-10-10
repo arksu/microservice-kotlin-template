@@ -89,8 +89,9 @@ dependencies {
 //    jooqGenerator(libs.mariadb.java.client)
     jooqGenerator(libs.postgres)
 
-    implementation("com.zaxxer:HikariCP:7.0.2")
-    implementation("com.github.kagkarlsson:db-scheduler:16.2.0")
+    implementation(libs.hikaricp)
+    implementation(libs.db.scheduler)
+    implementation(libs.kotlin.logging.jvm)
 
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)

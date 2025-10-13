@@ -1,19 +1,19 @@
 package com.company.scheduler
 
-import com.company.config.SchedulerJob
+import com.company.config.SchedulerTask
 import com.github.kagkarlsson.scheduler.task.helper.RecurringTask
 import com.github.kagkarlsson.scheduler.task.helper.Tasks
-import com.github.kagkarlsson.scheduler.task.schedule.CronSchedule
+import com.github.kagkarlsson.scheduler.task.schedule.FixedDelay
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.koin.core.annotation.Single
 
 @Single
-class HelloJob : SchedulerJob {
+class DemoTask : SchedulerTask {
     private val logger = KotlinLogging.logger { }
 
     override val task: RecurringTask<Void> = Tasks
-        .recurring("hello_task2", CronSchedule("*/2 * * * * *"))
+        .recurring("demo1", FixedDelay.ofSeconds(5))
         .execute { _, _ ->
-            logger.info { "hello job invoked" }
+            logger.info { "demo job invoked" }
         }
 }

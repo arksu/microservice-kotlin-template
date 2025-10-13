@@ -9,7 +9,7 @@ import javax.sql.DataSource
 val dbScheduler = module {
     single<Scheduler>(createdAtStart = true) {
         val dataSource: DataSource = get<DataSource>()
-        val jobs: List<SchedulerJob> = getAll()
+        val jobs: List<SchedulerTask> = getAll()
         val tasks = jobs.map { it.task }
 
         Scheduler.create(dataSource)
@@ -20,6 +20,6 @@ val dbScheduler = module {
     }
 }
 
-interface SchedulerJob {
+interface SchedulerTask {
     val task: RecurringTask<*>
 }

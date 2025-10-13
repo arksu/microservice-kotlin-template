@@ -74,6 +74,8 @@ dependencies {
     implementation(libs.akkurate.ktor.server)
     implementation(libs.ktorfit)
 
+    implementation(libs.redisson)
+
     implementation(libs.kotlinx.coroutines.reactor)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.jdk8)

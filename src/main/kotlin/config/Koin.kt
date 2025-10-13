@@ -22,6 +22,7 @@ fun Application.configureKoin() {
             AppModule().module,
             databaseModule(environment),
             dbScheduler,
+            configureRedisModule(),
             configureKafkaModule(),
             configureKtorfitModule(),
         )

@@ -7,6 +7,7 @@ import io.ktor.server.application.*
 import io.ktor.server.netty.*
 import org.flywaydb.core.Flyway
 import org.koin.ktor.ext.inject
+import org.redisson.api.RedissonClient
 
 fun main(args: Array<String>) {
     EngineMain.main(args)
@@ -20,11 +21,11 @@ fun Application.module() {
     configureKoin()
     configureJwtSecurity()
     configureRouting()
-//    configureScheduler()
     configureHealth()
 
     val flyway: Flyway by inject()
     val scheduler: Scheduler by inject()
+    val redis: RedissonClient by inject()
 
     monitor.subscribe(ApplicationStarted) {
         flyway.migrate()
@@ -33,5 +34,6 @@ fun Application.module() {
 
     monitor.subscribe(ApplicationStopping) {
         scheduler.stop()
+        redis.shutdown()
     }
 }

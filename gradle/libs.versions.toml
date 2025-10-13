@@ -18,6 +18,7 @@ ktorfit-version = "2.6.4" # https://github.com/Foso/Ktorfit
 ktor-plugins-version = "2.2.1" # https://mvnrepository.com/artifact/io.github.flaxoos/ktor-server-task-scheduling
 hikari-version = "7.0.2" # https://mvnrepository.com/artifact/com.zaxxer/HikariCP
 db-scheduler-version = "16.2.0" # https://mvnrepository.com/artifact/com.github.kagkarlsson/db-scheduler
+redisson-version = "3.52.0" #https://mvnrepository.com/artifact/org.redisson/redisson
 kotlin-logging-jvm-version = "7.0.13" # https://mvnrepository.com/artifact/io.github.oshai/kotlin-logging-jvm
 
 #mariadb-java-client-version = "3.5.2" # https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client
@@ -63,6 +64,7 @@ ktorfit = { module = "de.jensklingenberg.ktorfit:ktorfit-lib", version.ref = "kt
 hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikari-version" }
 db-scheduler = { module = "com.github.kagkarlsson:db-scheduler", version.ref = "db-scheduler-version" }
 kotlin-logging-jvm = { module = "io.github.oshai:kotlin-logging-jvm", version.ref = "kotlin-logging-jvm-version" }
+redisson = { module = "org.redisson:redisson", version.ref = "redisson-version" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }

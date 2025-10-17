@@ -108,12 +108,19 @@ buildscript {
     }
 }
 
+
+val dbHost = System.getenv("DB_HOST") ?: "localhost"
+val dbPort = System.getenv("DB_PORT") ?: 5332
+val dbDatabase = System.getenv("DB_NAME") ?: "project_name"
+val dbUser = System.getenv("DB_USERNAME") ?: "project_name"
+val dbPassword = System.getenv("DB_PASSWORD") ?: "project_name"
+val dbSchema = System.getenv("DB_SCHEMA") ?: "project_name"
+
 flyway {
-//    url = "jdbc:mariadb://localhost:3409/project_name"
-    url = "jdbc:postgresql://localhost:5332/project_name"
-    user = "project_name"
-    password = "project_name"
-    schemas = arrayOf("project_name")
+    url = "jdbc:postgresql://$dbHost:$dbPort/$dbDatabase"
+    user = dbUser
+    password = dbPassword
+    schemas = arrayOf(dbSchema)
     cleanDisabled = false
 }
 
@@ -130,16 +137,16 @@ jooq {
 //                    driver = "org.mariadb.jdbc.Driver"
                     driver = "org.postgresql.Driver"
 //                    url = "jdbc:mariadb://localhost:3409/project_name"
-                    url = "jdbc:postgresql://localhost:5332/project_name"
-                    user = "project_name"
-                    password = "project_name"
+                    url = "jdbc:postgresql://$dbHost:$dbPort/$dbDatabase"
+                    user = dbUser
+                    password = password
                 }
                 generator.apply {
                     name = "org.jooq.codegen.KotlinGenerator"
                     database.apply {
 //                        name = "org.jooq.meta.mariadb.MariaDBDatabase"
                         name = "org.jooq.meta.postgres.PostgresDatabase"
-                        inputSchema = "project_name"
+                        inputSchema = dbSchema
                         excludes = "flyway_schema_history"
                     }
                     generate.apply {

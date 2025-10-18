@@ -50,10 +50,10 @@ fun Application.configureRedisModule(): Module {
             // Keep alive configuration - enables TCP keepalive using system defaults
             // This ensures idle connections are kept alive and network issues are detected quickly
             // System TCP keepalive settings can be configured at OS level if needed
-            setKeepAlive(true)
-            setTcpKeepAliveCount(5)
-            setTcpKeepAliveIdle(10)
-            setTcpKeepAliveInterval(5)
+            isKeepAlive = true
+            tcpKeepAliveCount = 5
+            tcpKeepAliveIdle = 10
+            tcpKeepAliveInterval = 5
 
             // DNS monitoring (for production stability)
             this.dnsMonitoringInterval = dnsMonitoringInterval.toLong()

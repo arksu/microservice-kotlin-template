@@ -25,11 +25,18 @@ import java.time.Duration
 import javax.sql.DataSource
 
 fun databaseModule(environment: ApplicationEnvironment) = module {
-    val url = environment.getValueString("db.url")
-    val user = environment.getValueString("db.user")
-    val dbPassword = environment.getValueString("db.password")
-    val schema = environment.getValueString("db.schema", "public")
+    val dbHost = System.getenv("DB_HOST")
+    val dbPort = System.getenv("DB_PORT")
+    val dbDatabase = System.getenv("DB_NAME")
+    val dbUser = System.getenv("DB_USERNAME") ?: environment.getValueString("db.user")
+    val dbPassword = System.getenv("DB_PASSWORD") ?: environment.getValueString("db.password")
+    val dbSchema = System.getenv("DB_SCHEMA") ?: environment.getValueString("db.schema", "public")
+
+    val url = if (dbHost != null && dbPort != null && dbDatabase != null) "jdbc:postgresql://$dbHost:$dbPort/$dbDatabase"
+    else environment.getValueString("db.url")
+
     val r2dbcUrl = url.replace("jdbc", "r2dbc")
+
     val poolMaxSize = environment.getValueInt("db.poolMaxSize", 20)
     val poolInitialSize = environment.getValueInt("db.poolInitialSize", 20)
     val maxIdleTime = environment.getValueInt("db.maxIdleTime", 30)
@@ -42,7 +49,7 @@ fun databaseModule(environment: ApplicationEnvironment) = module {
             .option(DRIVER, "pool")
 //            .option(PROTOCOL, "mysql")
             .option(PROTOCOL, "postgresql")
-            .option(USER, user)
+            .option(USER, dbUser)
             .option(PASSWORD, dbPassword)
             .option(CONNECT_TIMEOUT, Duration.ofSeconds(connectionTimeout.toLong()))
             .option(STATEMENT_TIMEOUT, Duration.ofSeconds(statementTimeout.toLong()))
@@ -61,8 +68,9 @@ fun databaseModule(environment: ApplicationEnvironment) = module {
     single<DataSource> {
         val config = HikariConfig().apply {
             jdbcUrl = url
-            username = user
+            username = dbUser
             password = dbPassword
+            schema = dbSchema
             driverClassName = "org.postgresql.Driver"
             maximumPoolSize = 2
         }
@@ -72,7 +80,7 @@ fun databaseModule(environment: ApplicationEnvironment) = module {
     single<Flyway> {
         Flyway.configure()
             .dataSource(get<DataSource>())
-            .schemas(schema)
+            .schemas(dbSchema)
             .locations("classpath:db/migration")
             .load()
     }

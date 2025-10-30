@@ -35,7 +35,7 @@ fun ApplicationConfig.getKafkaProducerConfigs(): Map<String, ApplicationConfig> 
 }
 
 fun ApplicationConfig.getKafkaConsumerConfigs(): Map<String, ApplicationConfig> {
-    val consumersConfig = this.config("kafka.consumers")
+    val consumersConfig = runCatching { this.config("kafka.consumers") }.getOrNull() ?: return emptyMap()
     val consumersMap = mutableMapOf<String, ApplicationConfig>()
     for (name in consumersConfig.toMap().keys) {
         val conf = consumersConfig.config(name)

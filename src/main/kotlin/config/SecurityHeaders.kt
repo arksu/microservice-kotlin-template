@@ -2,7 +2,6 @@ package com.company.config
 
 import com.company.error.AuthenticationException
 import com.company.error.AuthorizationException
-import com.company.service.gson
 import com.google.gson.reflect.TypeToken
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -34,7 +33,14 @@ val RoleAuthorization = createRouteScopedPlugin(
         call.attributes.put(UserIdKey, userId)
 
         val permissionsHeader = call.request.headers["Permissions"] ?: throw AuthenticationException("No permissions in header")
-        val permissions: Set<String> = gson.fromJson<List<String>?>(permissionsHeader, listType).toSet()
+
+        val trimmed = permissionsHeader.trim()
+        val toParse = if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+            trimmed.substring(1, trimmed.length - 1)
+        } else {
+            trimmed
+        }
+        val permissions: Set<String> = toParse.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet()
 
         var denyReason: String? = null
 

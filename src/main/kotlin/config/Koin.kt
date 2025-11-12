@@ -1,6 +1,8 @@
 package com.company.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonMapperBuilder
 import io.ktor.server.application.*
 import org.koin.core.annotation.ComponentScan
@@ -12,6 +14,10 @@ import org.koin.logger.slf4jLogger
 
 fun Application.configureKoin() {
     val objectMapper: ObjectMapper = jacksonMapperBuilder().build()
+
+    objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+    objectMapper.registerModule(JavaTimeModule())
+
     install(Koin) {
         slf4jLogger()
         modules(

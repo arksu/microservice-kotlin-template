@@ -26,44 +26,41 @@ data class Check(val checkName: String, val check: CheckFunction)
 typealias CheckFunction = suspend () -> Boolean
 
 val KHealth = createApplicationPlugin("KHealth", ::KHealthConfiguration) {
-    onCall { call ->
-        KHealthPlugin(pluginConfig).apply { interceptor(call) }
+    application.routing {
+        KHealthPlugin(pluginConfig).registerRoutes(this)
     }
 }
 
 class KHealthPlugin internal constructor(private val config: KHealthConfiguration) {
 
     /**
-     * Interceptor that handles all http requests. If either the health check or ready endpoint are
-     * called it will return a custom response with the result of each custom check if any are defined.
+     * Registers the ready and health endpoints
      */
-    fun interceptor(call: ApplicationCall) {
-        val routing: Routing.() -> Unit = {
-            val routing: Route.() -> Unit = {
-                if (config.readyCheckEnabled) route(config.readyCheckPath) {
-                    get {
-                        val (status, responseBody) = processChecks(
-                            checkLinkedList = config.readyChecks,
-                            passingStatusCode = config.successfulCheckStatusCode,
-                            failingStatusCode = config.unsuccessfulCheckStatusCode
-                        )
-                        call.respondText(responseBody, ContentType.Application.Json, status)
-                    }
-                }
-                if (config.healthCheckEnabled) route(config.healthCheckPath) {
-                    get {
-                        val (status, responseBody) = processChecks(
-                            checkLinkedList = config.healthChecks,
-                            passingStatusCode = config.successfulCheckStatusCode,
-                            failingStatusCode = config.unsuccessfulCheckStatusCode
-                        )
-                        call.respondText(responseBody, ContentType.Application.Json, status)
-                    }
+    fun registerRoutes(routing: Routing) {
+        val routeSetup: Route.() -> Unit = {
+            if (config.readyCheckEnabled) route(config.readyCheckPath) {
+                get {
+                    val (status, responseBody) = processChecks(
+                        checkLinkedList = config.readyChecks,
+                        passingStatusCode = config.successfulCheckStatusCode,
+                        failingStatusCode = config.unsuccessfulCheckStatusCode
+                    )
+                    call.respondText(responseBody, ContentType.Application.Json, status)
                 }
             }
-            config.wrapWith?.invoke(this, routing) ?: routing(this)
+            if (config.healthCheckEnabled) route(config.healthCheckPath) {
+                get {
+                    val (status, responseBody) = processChecks(
+                        checkLinkedList = config.healthChecks,
+                        passingStatusCode = config.successfulCheckStatusCode,
+                        failingStatusCode = config.unsuccessfulCheckStatusCode
+                    )
+                    call.respondText(responseBody, ContentType.Application.Json, status)
+                }
+            }
         }
-        call.application.pluginOrNull(RoutingRoot)?.apply(routing) ?: call.application.install(RoutingRoot, routing)
+
+        config.wrapWith?.invoke(routing, routeSetup) ?: routeSetup(routing)
     }
 
     /**
@@ -152,6 +149,8 @@ class KHealthConfiguration internal constructor() {
 
 /**
  * A builder class used to create descriptive DSL for adding checks to an endpoint.
+ * @see healthChecks
+ * @see readyChecks
  */
 class CheckBuilder {
     val checks = linkedSetOf<Check>()

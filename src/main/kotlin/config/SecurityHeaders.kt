@@ -2,18 +2,17 @@ package com.company.config
 
 import com.company.error.AuthenticationException
 import com.company.error.AuthorizationException
-import com.google.gson.reflect.TypeToken
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
 import io.ktor.util.*
-import java.lang.reflect.Type
 
 typealias Permission = String
 
 internal val UserIdKey = AttributeKey<Long>("RoleAuthorization.userId")
 
-val listType: Type = object : TypeToken<ArrayList<String>>() {}.type
+const val HEADER_USER_ID = "UserId"
+const val HEADER_PERMISSIONS = "Permissions"
 
 class AuthConfig {
     var permissions: Set<String> = emptySet()
@@ -28,11 +27,11 @@ val RoleAuthorization = createRouteScopedPlugin(
     val type = pluginConfig.type
 
     on(AuthenticationChecked) { call ->
-        val userIdHeader = call.request.headers["UserId"] ?: "-1"
+        val userIdHeader = call.request.headers[HEADER_USER_ID] ?: "-1"
         val userId = userIdHeader.toLong()
         call.attributes.put(UserIdKey, userId)
 
-        val permissionsHeader = call.request.headers["Permissions"] ?: throw AuthenticationException("No permissions in header")
+        val permissionsHeader = call.request.headers[HEADER_PERMISSIONS] ?: throw AuthenticationException("No permissions in header")
 
         val trimmed = permissionsHeader.trim()
         val toParse = if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
@@ -40,7 +39,15 @@ val RoleAuthorization = createRouteScopedPlugin(
         } else {
             trimmed
         }
-        val permissions: Set<String> = toParse.split(',').map { it.trim() }.filter { it.isNotEmpty() }.toSet()
+        val permissions: Set<String> = toParse.split(',').map { it.trim() }.filter { it.isNotEmpty() }
+            .map {
+                if (it.startsWith("\"") && it.endsWith("\"")) {
+                    it.substring(1, it.length - 1)
+                } else {
+                    it
+                }
+            }
+            .toSet()
 
         var denyReason: String? = null
 
